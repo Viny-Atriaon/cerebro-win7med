@@ -16,6 +16,7 @@
   - **A chave:** fica em `.segredos/start-copia.env` (fora do git; precisa ir para o gerenciador de senhas) e no servidor (0600).
   - **No computador:** a tarefa Win7-BackupFora (GoogleX, commit `489a611`) baixa para `Documentos\Backups Win7\cerebro` e sobe para o Drive cifrado.
   - **Ensaio:** `node start/testes/restaurar-copia.mjs`.
+  - **Provado em 18/11:** primeira cópia gerada pelo cron às 17:17; baixada pela tarefa e conferida no Drive cifrado; aberta com a chave; `audit-runtime.sh` com 10 ✅ e 0 ❌.
 - **LGPD adiada pelo Viny (18/11):** é análise interna, não é exposta ao público e não trata dado sensível. Reavaliar até 18/02/2027 (CONFORMIDADE).
 - **Projetos salvos no start.win7.ai (18/11, ADR-008, pedido do Viny):** o diagnóstico e o onboarding de um cliente não ficavam salvos. Agora:
   - **Servidor pequeno em PHP** no cPanel da Win7 (`start/api/`), dados em JSON fora da pasta pública (`start-cerebro-dados`, na pasta da conta).
