@@ -52,6 +52,19 @@
           <button type="button" id="limpar">Limpar</button>
         </div>
         <p class="msg" id="msg-dados" role="status"></p>
+        <div class="salvar-sistema" id="salvar-sistema" hidden>
+          <div class="linha-salvar">
+            <label for="pasta-sistema">Pasta no sistema
+              <select id="pasta-sistema"><option value="">Sem pasta</option></select>
+            </label>
+            <button type="button" id="nova-pasta-botao">Nova pasta</button>
+            <button type="button" class="primario" id="salvar-agora" disabled>Salvar no sistema</button>
+          </div>
+          <div class="linha-salvar" id="nova-pasta-form" hidden>
+            <label for="nova-pasta-nome">Nome da pasta<input type="text" id="nova-pasta-nome" maxlength="60" placeholder="ex.: Onboardings de novembro"></label>
+            <button type="button" id="nova-pasta-criar">Criar pasta</button>
+          </div>
+        </div>
         <p class="msg" id="msg-sistema" role="status" hidden></p>
       </div>
     </section>

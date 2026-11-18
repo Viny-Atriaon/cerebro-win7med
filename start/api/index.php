@@ -2,7 +2,8 @@
 // API do start.win7.ai (ADR-008): projetos salvos (diagnóstico, onboarding e mapeamento) e a equipe que usa o Cérebro.
 // Tudo passa por aqui (/api/*, regra no .htaccess). Conta por pessoa, por convite; sessão por cookie HttpOnly.
 //   /api/saude · /api/sessao · /api/eu · /api/entrar · /api/sair · /api/convite/ver · /api/convite/aceitar
-//   /api/projetos (lista e salvar diagnóstico) · /api/projetos/<id> · .../onboarding · .../mapa · .../arquivar
+//   /api/projetos (lista e salvar diagnóstico) · /api/projetos/<id> · .../onboarding · .../mapa · .../pasta · .../arquivar
+//   /api/pastas (lista e criar) · /api/pastas/<id>/renomear · /api/pastas/<id>/apagar (só vazia)
 //   /api/equipe · /api/equipe/convites · /api/equipe/convites/cancelar · /api/equipe/situacao   (só administrador)
 declare(strict_types=1);
 require_once __DIR__ . '/lib/base.php';
@@ -14,7 +15,9 @@ set_exception_handler(function (Throwable $e) {
 
 const SCHEMA_RESPOSTAS = 'w7-onboarding-respostas';
 const SCHEMA_MAPA = 'w7-mapa-onboarding';
-const VERSOES_DIAGNOSTICO = 5;
+const VERSOES_DIAGNOSTICO = 20;
+const VERSOES_ONBOARDING = 10;
+const MAX_PASTAS = 200;
 const DIAS_BACKUP = 30;
 
 $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -82,8 +85,22 @@ function resumo_do(array $p): array {
     $c = $p['diagnostico']['cliente'] ?? [];
     return ['id' => $p['id'], 'slug' => $p['slug'], 'nome' => texto($c['nome'] ?? '', 160), 'cidade' => texto($c['cidade'] ?? '', 80), 'uf' => texto($c['uf'] ?? '', 4),
         'setor' => ($c['setor'] ?? '') === 'geral' ? 'geral' : 'saude', 'etapa' => etapa_do($p), 'modelo' => texto($p['diagnostico']['lp_modelo']['url'] ?? '', 200),
-        'criado_em' => $p['criado_em'], 'criado_por' => $p['criado_por'], 'atualizado_em' => $p['atualizado_em'], 'atualizado_por' => $p['atualizado_por'], 'arquivado' => !empty($p['arquivado'])];
+        'criado_em' => $p['criado_em'], 'criado_por' => $p['criado_por'], 'atualizado_em' => $p['atualizado_em'], 'atualizado_por' => $p['atualizado_por'], 'arquivado' => !empty($p['arquivado']),
+        'pasta' => (string) ($p['pasta'] ?? ''), 'versoes' => count($p['versoes'] ?? [])];
 }
+// pastas para organizar os projetos (pedido do Viny em 18/11): só nome; o projeto guarda o id da pasta
+function pastas(): array { return ler_json('pastas.json', []); }
+function achar_pasta(string $id): ?array { foreach (pastas() as $x) if ($x['id'] === $id) return $x; return null; }
+function nome_pasta_valido(string $nome): string {
+    $nome = texto($nome, 60);
+    if ($nome === '') erro(400, 'PASTA', 'Dê um nome para a pasta.');
+    return $nome;
+}
+function pasta_repetida(string $nome, string $exceto = ''): bool {
+    foreach (pastas() as $x) if ($x['id'] !== $exceto && mb_strtolower($x['nome']) === mb_strtolower($nome)) return true;
+    return false;
+}
+function quando_br(string $iso): string { $t = strtotime($iso); return $t ? date('d/m/Y H:i', $t) : $iso; }
 function ler_projeto(string $id): ?array { return preg_match('/^[a-f0-9]{16}$/', $id) ? ler_json('projetos/' . $id . '.json', null) : null; }
 /** Grava o projeto, o índice e a cópia do dia (backup: um arquivo por projeto por dia, 30 dias). Chamar dentro da trava. */
 function gravar_projeto(array $p): void {
@@ -199,10 +216,10 @@ if ($metodo === 'GET' && $caminho === '/api/sessao') enviar(200, ['usuario' => $
 if (!$s) erro(401, 'SEM_SESSAO', 'Entre para continuar.');
 if ($metodo === 'GET' && $caminho === '/api/eu') enviar(200, ['nome' => $s['nome'], 'email' => $s['email'], 'papel' => $s['papel']]);
 
-// lista de projetos (o mais recente primeiro); arquivados só para o administrador, com ?arquivados=1
+// lista de projetos (o mais recente primeiro); os arquivados vêm com ?arquivados=1
 if ($metodo === 'GET' && $caminho === '/api/projetos') {
     $todos = ler_json('projetos/indice.json', []);
-    $comArquivados = ($_GET['arquivados'] ?? '') === '1' && $s['papel'] === 'admin';
+    $comArquivados = ($_GET['arquivados'] ?? '') === '1';
     enviar(200, ['projetos' => array_values(array_filter($todos, fn($x) => $comArquivados || empty($x['arquivado'])))]);
 }
 
@@ -214,33 +231,43 @@ if ($metodo === 'POST' && $caminho === '/api/projetos') {
     $logo = (string) ($c['logo'] ?? '');
     if ($logo !== '' && !preg_match('#^data:image/(png|jpeg|webp|svg\+xml);base64,[A-Za-z0-9+/=]+$#', $logo)) erro(400, 'LOGO', 'Logo em formato não aceito.');
     $id = texto($c['id'] ?? '', 16);
-    $r = com_trava(function () use ($diag, $logo, $id, $s) {
+    // pasta escolhida no botão Salvar ('' tira da pasta); sem a chave, fica onde está
+    $temPasta = array_key_exists('pasta', $c);
+    $pasta = $temPasta ? texto($c['pasta'] ?? '', 12) : '';
+    if ($pasta !== '' && !achar_pasta($pasta)) erro(400, 'PASTA', 'Essa pasta não existe mais. Escolha outra.');
+    // "Abrir esta versão" + Salvar: volta o projeto para uma versão anterior (a atual vira versão também)
+    $versaoDe = texto($c['versao_de'] ?? '', 40);
+    $r = com_trava(function () use ($diag, $logo, $id, $s, $temPasta, $pasta, $versaoDe) {
         $slug = slug_de($diag['cliente']['nome']);
         $p = $id !== '' ? ler_projeto($id) : null;
         // o id só vale para o mesmo cliente: outro bloco colado na mesma página nunca grava por cima de outro projeto
         if ($p && ($p['slug'] !== $slug || !empty($p['arquivado']))) $p = null;
         if (!$p) foreach (ler_json('projetos/indice.json', []) as $x) if ($x['slug'] === $slug && empty($x['arquivado'])) { $p = ler_projeto($x['id']); break; }
         $novo = !$p;
+        $mudou = $novo || json_encode($p['diagnostico'] ?? null) !== json_encode($diag);
         if ($novo) $p = ['id' => novo_id(), 'slug' => $slug, 'criado_em' => agora(), 'criado_por' => $s['nome'], 'versoes' => [], 'historico' => []];
-        elseif (json_encode($p['diagnostico'] ?? null) !== json_encode($diag)) {
+        elseif ($mudou) {
             $p['versoes'] = array_slice(array_merge([['quando' => $p['atualizado_em'] ?? agora(), 'quem' => $p['atualizado_por'] ?? '', 'diagnostico' => $p['diagnostico']]], $p['versoes'] ?? []), 0, VERSOES_DIAGNOSTICO);
         }
         $p['slug'] = $slug;
         $p['diagnostico'] = $diag;
         if ($logo !== '') $p['logo'] = $logo; else unset($p['logo']);
-        anotar($p, $s, $novo ? 'diagnóstico criado' : 'diagnóstico atualizado');
+        $antes = (string) ($p['pasta'] ?? '');
+        if ($temPasta) { if ($pasta === '') unset($p['pasta']); else $p['pasta'] = $pasta; }
+        anotar($p, $s, $novo ? 'diagnóstico criado' : ($versaoDe !== '' && $mudou ? 'voltou para a versão de ' . quando_br($versaoDe) : ($mudou ? 'diagnóstico atualizado' : 'diagnóstico salvo')));
+        if ($temPasta && $antes !== $pasta) anotar($p, $s, $pasta === '' ? 'tirado da pasta' : 'guardado na pasta ' . (achar_pasta($pasta)['nome'] ?? ''));
         gravar_projeto($p);
-        return ['id' => $p['id'], 'novo' => $novo, 'atualizado_em' => $p['atualizado_em']];
+        return ['id' => $p['id'], 'novo' => $novo, 'atualizado_em' => $p['atualizado_em'], 'pasta' => (string) ($p['pasta'] ?? '')];
     });
     registrar('info', 'diagnostico_salvo', ['id' => $r['id'], 'quem' => $s['email']]);
     enviar(200, $r);
 }
 
-if (preg_match('#^/api/projetos/([a-f0-9]{16})(?:/(onboarding|mapa|arquivar))?$#', $caminho, $m)) {
+if (preg_match('#^/api/projetos/([a-f0-9]{16})(?:/(onboarding|mapa|pasta|arquivar))?$#', $caminho, $m)) {
     [$tudo, $id] = $m; $parte = $m[2] ?? '';
     if ($metodo === 'GET' && $parte === '') {
         $p = ler_projeto($id);
-        if (!$p || (!empty($p['arquivado']) && $s['papel'] !== 'admin')) erro(404, 'PROJETO', 'Projeto não encontrado.');
+        if (!$p) erro(404, 'PROJETO', 'Projeto não encontrado.');
         // as versões anteriores só vêm inteiras com ?versoes=1 (rede de segurança, não o dia a dia)
         if (($_GET['versoes'] ?? '') !== '1') foreach (['versoes', 'versoes_onboarding'] as $k) $p[$k] = array_map(fn($v) => ['quando' => $v['quando'] ?? '', 'quem' => $v['quem'] ?? ''], $p[$k] ?? []);
         enviar(200, $p);
@@ -257,7 +284,7 @@ if (preg_match('#^/api/projetos/([a-f0-9]{16})(?:/(onboarding|mapa|arquivar))?$#
                 // cada sessão de onboarding (outra pessoa, ou 15 minutos parado) guarda a anterior: "Apagar respostas" nunca perde nada
                 $ant = $p['onboarding'] ?? null;
                 if ($ant && (($ant['atualizado_por'] ?? '') !== $s['nome'] || strtotime($ant['atualizado_em']) < time() - 900))
-                    $p['versoes_onboarding'] = array_slice(array_merge([['quando' => $ant['atualizado_em'], 'quem' => $ant['atualizado_por'] ?? '', 'respostas' => $ant['respostas']]], $p['versoes_onboarding'] ?? []), 0, VERSOES_DIAGNOSTICO);
+                    $p['versoes_onboarding'] = array_slice(array_merge([['quando' => $ant['atualizado_em'], 'quem' => $ant['atualizado_por'] ?? '', 'respostas' => $ant['respostas']]], $p['versoes_onboarding'] ?? []), 0, VERSOES_ONBOARDING);
                 $p['onboarding'] = ['respostas' => $valor, 'atualizado_em' => agora(), 'atualizado_por' => $s['nome']];
                 anotar($p, $s, 'onboarding', true);
             }
@@ -268,8 +295,23 @@ if (preg_match('#^/api/projetos/([a-f0-9]{16})(?:/(onboarding|mapa|arquivar))?$#
         if (!$r) erro(404, 'PROJETO', 'Projeto não encontrado.');
         enviar(200, $r);
     }
+    if ($metodo === 'PUT' && $parte === 'pasta') {
+        $pasta = texto(ler_corpo(500)['pasta'] ?? '', 12);
+        if ($pasta !== '' && !achar_pasta($pasta)) erro(400, 'PASTA', 'Essa pasta não existe mais. Escolha outra.');
+        $ok = com_trava(function () use ($id, $pasta, $s) {
+            $p = ler_projeto($id);
+            if (!$p) return false;
+            if ((string) ($p['pasta'] ?? '') === $pasta) return true;
+            if ($pasta === '') unset($p['pasta']); else $p['pasta'] = $pasta;
+            anotar($p, $s, $pasta === '' ? 'tirado da pasta' : 'guardado na pasta ' . (achar_pasta($pasta)['nome'] ?? ''));
+            gravar_projeto($p);
+            return true;
+        });
+        if (!$ok) erro(404, 'PROJETO', 'Projeto não encontrado.');
+        enviar(200, ['ok' => true, 'pasta' => $pasta]);
+    }
+    // arquivar tira da lista principal e nunca apaga; qualquer pessoa da equipe arquiva e desarquiva (fica no histórico)
     if ($metodo === 'POST' && $parte === 'arquivar') {
-        if ($s['papel'] !== 'admin') erro(403, 'PAPEL', 'Só o administrador arquiva projetos.');
         $arquivar = !empty(ler_corpo(500)['arquivar']);
         $ok = com_trava(function () use ($id, $arquivar, $s) {
             $p = ler_projeto($id);
@@ -282,6 +324,50 @@ if (preg_match('#^/api/projetos/([a-f0-9]{16})(?:/(onboarding|mapa|arquivar))?$#
         if (!$ok) erro(404, 'PROJETO', 'Projeto não encontrado.');
         enviar(200, ['ok' => true]);
     }
+}
+
+// ---------------------------------------------------------------- pastas (toda a equipe organiza)
+if ($metodo === 'GET' && $caminho === '/api/pastas') enviar(200, ['pastas' => pastas()]);
+if ($metodo === 'POST' && $caminho === '/api/pastas') {
+    $nome = nome_pasta_valido((string) (ler_corpo(1000)['nome'] ?? ''));
+    $r = com_trava(function () use ($nome, $s) {
+        $todas = pastas();
+        if (pasta_repetida($nome)) return 'repetida';
+        if (count($todas) >= MAX_PASTAS) return 'cheio';
+        $nova = ['id' => bin2hex(random_bytes(6)), 'nome' => $nome, 'criada_em' => agora(), 'criada_por' => $s['nome']];
+        $todas[] = $nova;
+        usort($todas, fn($a, $b) => strcasecmp($a['nome'], $b['nome']));
+        gravar_json('pastas.json', $todas);
+        return $nova;
+    });
+    if ($r === 'repetida') erro(409, 'PASTA', 'Já existe uma pasta com esse nome.');
+    if ($r === 'cheio') erro(400, 'PASTA', 'Limite de pastas atingido.');
+    registrar('info', 'pasta_criada', ['nome' => $nome, 'quem' => $s['email']]);
+    enviar(200, $r);
+}
+if (preg_match('#^/api/pastas/([a-f0-9]{12})/(renomear|apagar)$#', $caminho, $m) && $metodo === 'POST') {
+    [$tudo, $pid, $acao] = $m;
+    $nome = $acao === 'renomear' ? nome_pasta_valido((string) (ler_corpo(1000)['nome'] ?? '')) : '';
+    $r = com_trava(function () use ($pid, $acao, $nome) {
+        $todas = pastas();
+        $i = array_search($pid, array_column($todas, 'id'), true);
+        if ($i === false) return 'sumiu';
+        if ($acao === 'renomear') {
+            if (pasta_repetida($nome, $pid)) return 'repetida';
+            $todas[$i]['nome'] = $nome;
+            usort($todas, fn($a, $b) => strcasecmp($a['nome'], $b['nome']));
+        } else {
+            // só apaga pasta vazia (contando os arquivados): projeto nunca fica órfão
+            foreach (ler_json('projetos/indice.json', []) as $x) if (($x['pasta'] ?? '') === $pid) return 'ocupada';
+            array_splice($todas, $i, 1);
+        }
+        gravar_json('pastas.json', array_values($todas));
+        return 'ok';
+    });
+    if ($r === 'sumiu') erro(404, 'PASTA', 'Pasta não encontrada.');
+    if ($r === 'repetida') erro(409, 'PASTA', 'Já existe uma pasta com esse nome.');
+    if ($r === 'ocupada') erro(409, 'PASTA', 'A pasta tem projetos. Mova os projetos antes de apagar.');
+    enviar(200, ['ok' => true]);
 }
 
 // ---------------------------------------------------------------- equipe (só administrador)

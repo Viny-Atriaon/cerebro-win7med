@@ -145,12 +145,36 @@ def main() -> int:
             fr.locator("#msg-sistema.ok").wait_for(timeout=10000)
             if "no sistema" not in fr.locator("#msg-sistema").inner_text():
                 falhas.append("pc: diagnóstico não foi salvo no sistema")
+            # pasta nova pela própria Análise e o botão Salvar no sistema (pedido de 18/11)
+            fr.locator("#nova-pasta-botao").click()
+            fr.locator("#nova-pasta-nome").fill("Onboardings de novembro")
+            fr.locator("#nova-pasta-criar").click()
+            pg.wait_for_timeout(900)
+            if "pasta Onboardings de novembro" not in fr.locator("#msg-sistema").inner_text():
+                falhas.append(f"pc: projeto não foi para a pasta nova ({fr.locator('#msg-sistema').inner_text()!r})")
+            fr.locator("#salvar-agora").click()
+            pg.wait_for_timeout(900)
+            if "Projeto salvo no sistema na pasta Onboardings de novembro" not in fr.locator("#msg-sistema").inner_text():
+                falhas.append(f"pc: botão Salvar no sistema não confirmou ({fr.locator('#msg-sistema').inner_text()!r})")
+            fr.locator("#salvar-sistema").scroll_into_view_if_needed()
             pg.wait_for_timeout(450)
             pg.screenshot(path=str(pasta / "start-pc-03-analise-salva.png"))
+            # segunda versão: muda a cidade e gera de novo (a primeira vira versão anterior)
+            outra = json.loads(json.dumps(exemplo)); outra["cliente"]["cidade"] = "Cidade da Versão Nova"
+            fr.locator("#dados").fill(json.dumps(outra, ensure_ascii=False))
+            fr.locator("#gerar").click()
+            pg.wait_for_timeout(1200)
+            fr.locator("#dados").fill(json.dumps(exemplo, ensure_ascii=False))
+            fr.locator("#gerar").click()
+            pg.wait_for_timeout(1200)
             fr.locator("#apresentar").click()
             fr.locator("#dk:not([hidden])").wait_for()
             responder(pg, fr, falhas, "pc")
-            pg.wait_for_timeout(1800)
+            fr.locator('[data-acao="salvar-agora"]').click()
+            pg.wait_for_timeout(1200)
+            if "Respostas salvas no sistema" not in fr.locator("#dk").inner_text():
+                falhas.append("pc: o botão Salvar da apresentação não confirmou")
+            pg.wait_for_timeout(600)
             salvo = fr.locator(".dk-salvo").inner_text()
             if "Salvo no sistema" not in salvo:
                 falhas.append(f"pc: respostas não salvas no sistema ({salvo!r})")
@@ -169,10 +193,34 @@ def main() -> int:
             linha = pg.inner_text(".projeto")
             if "Clínica Teste Salvamento" not in linha or "Mapeamento pronto" not in linha:
                 falhas.append(f"pc: projeto não aparece pronto na lista ({linha!r})")
+            if "Feito por Admin Teste" not in linha:
+                falhas.append("pc: a lista não mostra quem fez o projeto")
+            chip = pg.locator('.chip-pasta', has_text="Onboardings de novembro")
+            if chip.count() != 1 or "1" not in chip.inner_text():
+                falhas.append("pc: a pasta não aparece com o projeto dentro")
+            else:
+                chip.click(); pg.wait_for_timeout(300)
+                if pg.locator(".projeto").count() != 1 or pg.is_hidden("#cab-pasta"):
+                    falhas.append("pc: ao abrir a pasta, o projeto não aparece")
             pg.click('.projeto [data-acao="historico"]')
             pg.wait_for_selector(".detalhe li")
+            if pg.locator('.detalhe [data-acao="versao"]').count() < 2:
+                falhas.append("pc: o histórico não mostra as versões anteriores do diagnóstico")
             pg.wait_for_timeout(450)
             pg.screenshot(path=str(pasta / "start-pc-05-projetos.png"))
+            # abrir a versão com a cidade antiga trocada (a mais recente das anteriores) e voltar o projeto para ela
+            pg.locator('.detalhe [data-acao="versao"]').first.click()
+            fr.locator("#msg-sistema").wait_for()
+            pg.wait_for_timeout(900)
+            if "Você está vendo a versão de" not in fr.locator("#msg-sistema").inner_text():
+                falhas.append(f"pc: abrir versão não avisou ({fr.locator('#msg-sistema').inner_text()!r})")
+            elif "Cidade da Versão Nova" not in fr.locator("#dados").input_value():
+                falhas.append("pc: a versão aberta não é a anterior")
+            else:
+                fr.locator("#salvar-agora").click(); pg.wait_for_timeout(1000)
+                if "voltou para esta versão" not in fr.locator("#msg-sistema").inner_text():
+                    falhas.append(f"pc: salvar a versão não voltou o projeto ({fr.locator('#msg-sistema').inner_text()!r})")
+            pg.click('[data-aba="projetos"]'); pg.wait_for_timeout(800)
             # equipe: gerar convite
             pg.goto(base + "/#equipe")
             pg.wait_for_selector(".pessoa")
@@ -248,6 +296,11 @@ def main() -> int:
             sem_rolagem(pg3, "cel", falhas, "projetos")
             pg3.wait_for_timeout(450)
             pg3.screenshot(path=str(pasta / "start-cel-03-projetos.png"), full_page=True)
+            pg3.locator('.chip-pasta', has_text="Onboardings de novembro").click()
+            pg3.click('.projeto [data-acao="historico"]'); pg3.wait_for_selector(".detalhe li")
+            sem_rolagem(pg3, "cel", falhas, "projetos com histórico e versões")
+            pg3.wait_for_timeout(450)
+            pg3.screenshot(path=str(pasta / "start-cel-03b-pasta-versoes.png"), full_page=True)
             pg3.click("#conta-botao")
             pg3.wait_for_timeout(450)
             pg3.screenshot(path=str(pasta / "start-cel-04-conta.png"))

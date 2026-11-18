@@ -37,17 +37,19 @@
     rotuloSalvo('Salvando no sistema...', false);
     st.tSistema = setTimeout(despachar, imediato ? 0 : 1200);
   }
-  function despachar(urgente) {
+  function despachar(urgente, aoTerminar) {
     var sis = st.sistema; if (!sis) return;
     clearTimeout(st.tSistema); st.tSistema = null;
     if (st.enviando && !urgente) { st.denovo = true; return; }
     st.enviando = true; st.denovo = false;
     sis.salvarRespostas(JSON.parse(JSON.stringify(st.r)), urgente === true).then(function () {
       st.enviando = false; if (st.sistema !== sis) return;
+      if (aoTerminar) aoTerminar(true);
       if (st.denovo) { despachar(); return; }
       rotuloSalvo('Salvo no sistema às ' + hora(), false);
     }, function (e) {
       st.enviando = false; if (st.sistema !== sis) return;
+      if (aoTerminar) aoTerminar(false);
       var definitivo = e && (e.status === 400 || e.status === 404 || e.status === 413);
       rotuloSalvo(definitivo ? 'Não salvou no sistema: exporte o rascunho' : 'Sem conexão com o sistema: tentando de novo', true);
       if (!definitivo) st.tSistema = setTimeout(despachar, 8000);
@@ -401,6 +403,7 @@
     el.className = 'dk'; el.id = 'dk'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'Apresentação do onboarding'); el.hidden = true;
     el.innerHTML = '<div class="dk-faixa" aria-hidden="true"><span class="a"></span><span class="v"></span><span class="g"></span><span class="b"></span></div>' +
       '<header class="dk-topo"><img class="dk-logo" alt=""><div class="dk-cli"><b></b><span></span></div><div class="dk-prog" aria-hidden="true"></div><div class="dk-acoes"><span class="dk-salvo" aria-live="polite"></span>' +
+      '<button type="button" class="dk-btn" data-acao="salvar-agora" hidden title="Salva as respostas no sistema agora (elas também salvam sozinhas a cada mudança)">Salvar</button>' +
       '<button type="button" class="dk-btn" data-acao="roteiro">Roteiro</button><button type="button" class="dk-btn" data-acao="notas" aria-pressed="false" title="Notas de quem conduz (tecla N)">Notas</button><button type="button" class="dk-btn" data-acao="sair">Sair</button></div></header>' +
       faixaPulso() +
       '<main class="dk-palco"><div class="dk-slide" tabindex="-1"></div></main>' +
@@ -505,6 +508,12 @@
     else if (acao === 'notas') { st.notas = !st.notas; a.setAttribute('aria-pressed', String(st.notas)); st.el.querySelector('.dk-notas').hidden = !st.notas; }
     else if (acao === 'roteiro') { st.gaveta = !st.gaveta; st.el.querySelector('.dk-gaveta').hidden = !st.gaveta; }
     else if (acao === 'sair') fechar();
+    else if (acao === 'salvar-agora' && st.sistema) {
+      if (st.timer) { clearTimeout(st.timer); st.timer = null; }
+      st.r.atualizado_em = new Date().toISOString();
+      try { localStorage.setItem(st.chave, JSON.stringify({ diagnostico: st.diag, respostas: st.r })); } catch (er) { /* fica a do sistema */ }
+      despachar(true, function (ok) { toast(ok ? 'Respostas salvas no sistema. Ficam no projeto, na aba Projetos do start.' : 'Não salvou agora: o sistema tenta de novo sozinho.'); });
+    }
     else if (acao === 'add-servico') { var inp = st.el.querySelector('#dk-novo-servico'); var n = inp.value.trim(); if (n) { st.r.servicos.push({ nome: n, sugerido: false, confirmado: true, ordem: st.r.servicos.length }); salvar(); desenhar(true); } }
     else if (acao === 'add-cidade') { var nc = st.el.querySelector('#dk-nova-cidade').value.trim(); var km = num(st.el.querySelector('#dk-nova-km').value); if (nc) { st.r.cidades.push({ nome: nc, uf: '', km: km, zona: 0, atuar: true, adicionada: true }); salvar(); desenhar(true); } }
     else if (acao === 'gerar-mapa') gerarMapa();
@@ -645,6 +654,7 @@
       st.el.hidden = false; document.documentElement.style.overflow = 'hidden';
       desenhar(false);
       rotuloSalvo(st.sistema && doSistema ? 'Salvo no sistema' : '', false);
+      st.el.querySelector('[data-acao="salvar-agora"]').hidden = !st.sistema;
       if (st.sistema && escolhida && escolhida === local) enviarAoSistema(true);
       if (!M.urlModelo(diag)) {
         // sem link publicado: o modelo é montado aqui, com a logo e as cores do cliente

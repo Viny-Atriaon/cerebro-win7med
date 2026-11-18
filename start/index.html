@@ -142,19 +142,40 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
 .marcar{display:flex;align-items:center;gap:8px;min-height:46px;font-size:14px;color:var(--texto);cursor:pointer}
 .marcar input{width:18px;height:18px;accent-color:var(--petroleo)}
 .projetos{display:grid;gap:12px}
-.projeto{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) auto;gap:18px;align-items:center;background:var(--cartao);border:1px solid var(--linha);border-radius:18px;padding:18px 20px}
+.projeto{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1.5fr);gap:14px 22px;align-items:center;background:var(--cartao);border:1px solid var(--linha);border-radius:18px;padding:18px 20px}
 .projeto.arquivado{opacity:.7;border-style:dashed}
 .projeto .nome{display:grid;gap:2px;min-width:0}
 .projeto .nome b{font-size:16.5px;line-height:1.2;overflow-wrap:anywhere}
-.projeto .nome span,.projeto .quando-p{font-size:13.5px;color:var(--apagado)}
-.projeto .quando-p b{display:block;font-size:14px;color:var(--texto);font-weight:400}
+.projeto .nome span{font-size:13.5px;color:var(--apagado)}
 .etapa{display:grid;gap:6px}
 .etapa .pontos{display:flex;gap:5px}
 .etapa .pontos i{width:22px;height:6px;border-radius:3px;background:var(--linha)}
 .etapa[data-e="diagnostico"] .pontos i:nth-child(-n+1),.etapa[data-e="onboarding"] .pontos i:nth-child(-n+2),.etapa[data-e="mapeamento"] .pontos i{background:var(--petroleo-claro)}
 .etapa[data-e="mapeamento"] .pontos i{background:var(--verde)}
 .etapa span{font-size:13.5px;font-weight:700;color:var(--texto)}
-.projeto .acoes-p{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.projeto .acoes-p{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start;align-items:center;padding-top:12px;border-top:1px solid var(--linha)}
+.quem-p{display:grid;gap:2px;font-size:13.5px;color:var(--apagado);min-width:0}
+.quem-p b{color:var(--texto);font-weight:700}
+.tag-pasta{display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:12.5px;font-weight:700;color:var(--petroleo);min-width:0}
+.tag-pasta svg{width:13px;height:13px;flex:none}
+.sel-pasta select{min-height:36px;max-width:210px;padding:5px 10px;border:1.5px solid var(--linha-forte);border-radius:10px;background:var(--cartao);font-size:13.5px;font-weight:700;color:var(--texto)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* pastas */
+.pastas{display:flex;flex-wrap:wrap;gap:8px}
+.chip-pasta{display:inline-flex;align-items:center;gap:8px;min-height:40px;max-width:100%;padding:7px 14px;border-radius:999px;border:1.5px solid var(--linha-forte);background:var(--cartao);font-weight:700;font-size:14px;color:var(--texto);cursor:pointer}
+.chip-pasta .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.chip-pasta .q{font-weight:400;color:var(--apagado);font-variant-numeric:tabular-nums}
+.chip-pasta svg{width:16px;height:16px;flex:none}
+.chip-pasta:hover{border-color:var(--petroleo)}
+.chip-pasta[aria-pressed="true"]{background:var(--petroleo);border-color:var(--petroleo);color:#fff}
+.chip-pasta[aria-pressed="true"] .q{color:#cfe3ec}
+.chip-pasta.nova{border-style:dashed;color:var(--petroleo)}
+.form-pasta{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:var(--cartao);border:1px solid var(--linha);border-radius:16px;padding:14px}
+.form-pasta .campo{flex:1 1 260px}
+.cab-pasta{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.cab-pasta h2{font-size:1.3rem;line-height:1.2;margin-right:auto;min-width:0;overflow-wrap:anywhere}
+.detalhe h4{font-size:14px}
+.detalhe .versoes li{align-items:center}
 .detalhe{grid-column:1/-1;border-top:1px solid var(--linha);padding-top:14px;display:grid;gap:10px}
 .detalhe ol{list-style:none;display:grid;gap:6px;max-height:260px;overflow:auto}
 .detalhe li{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:14px;color:var(--texto)}
@@ -189,8 +210,8 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
 @media (prefers-reduced-motion:reduce){.pulso .luz,.ecg .luz{display:none}}
 
 @media (max-width:980px){
-  .projeto{grid-template-columns:minmax(0,1fr) auto;gap:12px 16px}
-  .projeto .acoes-p{grid-column:1/-1;justify-content:flex-start}
+  .projeto{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 16px}
+  .projeto .quem-p{grid-column:1/-1}
   .grade-equipe{grid-template-columns:1fr}
 }
 @media (max-width:860px){
@@ -284,13 +305,24 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     <div class="envolve">
       <div class="abre menor">
         <h1 id="t-projetos">Projetos salvos</h1>
-        <p>Cada diagnóstico gerado na Análise, as respostas do onboarding e o mapeamento. Abra para rever ou continuar, ou baixe os dados para a pasta do robô 3.</p>
+        <p>Cada análise fica salva com o nome de quem fez, o histórico e as versões anteriores: o diagnóstico, as respostas do onboarding e o mapeamento. Organize em pastas, abra para rever ou continuar, ou baixe os dados para a pasta do robô 3.</p>
+      </div>
+      <div class="pastas" id="pastas" role="group" aria-label="Pastas"></div>
+      <form class="form-pasta" id="form-pasta" hidden novalidate>
+        <div class="campo"><label for="nome-pasta" id="rotulo-pasta">Nome da nova pasta</label><input id="nome-pasta" maxlength="60" autocomplete="off" placeholder="ex.: Onboardings de novembro"></div>
+        <button class="btn primario" type="submit" id="form-pasta-ok">Criar pasta</button>
+        <button class="btn" type="button" id="form-pasta-cancelar">Cancelar</button>
+      </form>
+      <div class="cab-pasta" id="cab-pasta" hidden>
+        <h2 id="titulo-pasta"></h2>
+        <button class="btn pequeno" type="button" id="renomear-pasta">Renomear pasta</button>
+        <button class="btn pequeno perigo" type="button" id="apagar-pasta">Apagar pasta</button>
       </div>
       <div class="ferramentas">
         <div class="campo"><label for="busca">Buscar cliente ou cidade</label><input id="busca" type="search" autocomplete="off" placeholder="ex.: Vértice, Goiânia"></div>
         <div class="campo etapas"><label for="filtro-etapa">Etapa</label>
           <select id="filtro-etapa"><option value="">Todas</option><option value="diagnostico">Só diagnóstico</option><option value="onboarding">Onboarding em andamento</option><option value="mapeamento">Mapeamento pronto</option></select></div>
-        <label class="marcar" id="ver-arquivados-l" hidden><input type="checkbox" id="ver-arquivados"> Mostrar arquivados</label>
+        <div class="campo etapas"><label for="filtro-quem">Feito por</label><select id="filtro-quem"><option value="">Todos</option></select></div>
         <a class="btn primario" href="#analise" data-novo="1">Novo projeto</a>
       </div>
       <p class="aviso" id="msg-projetos" role="status" hidden></p>
@@ -407,7 +439,7 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     eu = u;
     $('conta-botao').textContent = iniciais(u.nome);
     $('conta-nome').textContent = u.nome; $('conta-email').textContent = u.email + (u.papel === 'admin' ? ' · administrador' : '');
-    $('menu-equipe').hidden = u.papel !== 'admin'; $('ver-arquivados-l').hidden = u.papel !== 'admin';
+    $('menu-equipe').hidden = u.papel !== 'admin';
     $('abas').hidden = false; $('conta').hidden = false;
     porta(null); listaVelha = true; mostrar();
   }
@@ -516,44 +548,124 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     mostrar();
   });
 
-  // ---------------------------------------------------------------- projetos
+  // ---------------------------------------------------------------- projetos e pastas
+  var PASTA_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4.2l2 2.2h8.8A1.5 1.5 0 0 1 21 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+  var pastas = [], pastaAtual = '', modoPasta = '';
   function carregarProjetos() {
     listaVelha = false;
     if (!projetos.length) aviso('msg-projetos', 'Carregando os projetos...', '');
-    api('GET', 'projetos' + ($('ver-arquivados').checked ? '?arquivados=1' : '')).then(function (r) {
-      projetos = r.projetos || []; aviso('msg-projetos', ''); desenharProjetos();
+    Promise.all([api('GET', 'projetos?arquivados=1'), api('GET', 'pastas')]).then(function (r) {
+      projetos = r[0].projetos || []; pastas = r[1].pastas || [];
+      aviso('msg-projetos', ''); desenharTudo();
     }, function (e) { listaVelha = true; aviso('msg-projetos', 'Não consegui carregar os projetos: ' + e.message, 'erro'); });
   }
   function semAcento(t) { return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function pastaDe(p) { for (var i = 0; i < pastas.length; i++) if (pastas[i].id === p.pasta) return pastas[i]; return null; }
+  function naPasta(p, alvo) {
+    if (alvo === '_arq') return p.arquivado;
+    if (p.arquivado) return false;
+    if (alvo === '') return true;
+    if (alvo === '_sem') return !pastaDe(p);
+    return p.pasta === alvo;
+  }
+  function desenharTudo() { desenharPastas(); desenharFiltroQuem(); desenharProjetos(); }
+  function desenharPastas() {
+    if (pastaAtual && pastaAtual.charAt(0) !== '_' && !pastas.some(function (x) { return x.id === pastaAtual; })) pastaAtual = '';
+    var conta = function (alvo) { return projetos.filter(function (p) { return naPasta(p, alvo); }).length; };
+    var chip = function (alvo, rotulo, icone) {
+      return '<button type="button" class="chip-pasta" data-pasta="' + esc(alvo) + '" aria-pressed="' + (pastaAtual === alvo) + '">' + (icone ? PASTA_SVG : '') + '<span class="t">' + esc(rotulo) + '</span><span class="q">' + conta(alvo) + '</span></button>';
+    };
+    var arq = conta('_arq');
+    $('pastas').innerHTML = chip('', 'Todos', false) + pastas.map(function (x) { return chip(x.id, x.nome, true); }).join('') +
+      (pastas.length ? chip('_sem', 'Sem pasta', false) : '') + (arq || pastaAtual === '_arq' ? chip('_arq', 'Arquivados', false) : '') +
+      '<button type="button" class="chip-pasta nova" id="nova-pasta">+ Nova pasta</button>';
+    var atual = pastas.filter(function (x) { return x.id === pastaAtual; })[0];
+    $('cab-pasta').hidden = !atual;
+    if (atual) {
+      $('titulo-pasta').textContent = atual.nome;
+      var ocupada = projetos.some(function (p) { return p.pasta === atual.id; });
+      $('apagar-pasta').disabled = ocupada;
+      $('apagar-pasta').title = ocupada ? 'Só dá para apagar a pasta vazia (mova os projetos antes)' : '';
+    }
+  }
+  function desenharFiltroQuem() {
+    var sel = $('filtro-quem'), atual = sel.value, nomes = {};
+    projetos.forEach(function (p) { if (p.criado_por) nomes[p.criado_por] = 1; });
+    var lista = Object.keys(nomes).sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); });
+    sel.innerHTML = '<option value="">Todos</option>' + lista.map(function (n) { return '<option>' + esc(n) + '</option>'; }).join('');
+    sel.value = lista.indexOf(atual) >= 0 ? atual : '';
+  }
+  function opcoesPasta(escolhida) {
+    return '<option value="">Sem pasta</option>' + pastas.map(function (x) { return '<option value="' + esc(x.id) + '"' + (x.id === escolhida ? ' selected' : '') + '>' + esc(x.nome) + '</option>'; }).join('');
+  }
   function desenharProjetos() {
-    var busca = semAcento($('busca').value.trim()), etapa = $('filtro-etapa').value;
+    var busca = semAcento($('busca').value.trim()), etapa = $('filtro-etapa').value, quem = $('filtro-quem').value;
     var lista = projetos.filter(function (p) {
-      return (!etapa || p.etapa === etapa) && (!busca || semAcento(p.nome + ' ' + p.cidade + ' ' + p.uf).indexOf(busca) >= 0);
+      return naPasta(p, pastaAtual) && (!etapa || p.etapa === etapa) && (!quem || p.criado_por === quem) &&
+        (!busca || semAcento(p.nome + ' ' + p.cidade + ' ' + p.uf).indexOf(busca) >= 0);
     });
     var alvo = $('lista-projetos');
     if (!projetos.length) {
       alvo.innerHTML = '<div class="vazio"><b>Nenhum projeto salvo ainda.</b><span>Gere um diagnóstico na Análise: ele aparece aqui na hora, com o onboarding e o mapeamento.</span><a class="btn primario" href="#analise" data-novo="1">Abrir a análise</a></div>';
       return;
     }
-    if (!lista.length) { alvo.innerHTML = '<div class="vazio"><b>Nenhum projeto com esse filtro.</b></div>'; return; }
+    if (!lista.length) { alvo.innerHTML = '<div class="vazio"><b>' + (pastaAtual && pastaAtual.charAt(0) !== '_' && !etapa && !quem && !busca ? 'Pasta vazia.' : 'Nenhum projeto com esse filtro.') + '</b>' + (pastaAtual && pastaAtual.charAt(0) !== '_' ? '<span>Para guardar um projeto aqui, escolha a pasta no próprio projeto ou no botão Salvar no sistema da Análise.</span>' : '') + '</div>'; return; }
     alvo.innerHTML = lista.map(function (p) {
-      var local = [p.cidade, p.uf].filter(Boolean).join('/');
+      var local = [p.cidade, p.uf].filter(Boolean).join('/'), pasta = pastaDe(p);
       return '<article class="projeto' + (p.arquivado ? ' arquivado' : '') + '" data-id="' + esc(p.id) + '">' +
-        '<div class="nome"><b>' + esc(p.nome) + '</b><span>' + esc(local || 'cidade não informada') + (p.setor === 'geral' ? ' · fora da saúde' : '') + (p.arquivado ? ' · arquivado' : '') + '</span></div>' +
+        '<div class="nome"><b>' + esc(p.nome) + '</b><span>' + esc(local || 'cidade não informada') + (p.setor === 'geral' ? ' · fora da saúde' : '') + (p.arquivado ? ' · arquivado' : '') + '</span>' +
+          (pasta && pastaAtual !== p.pasta ? '<span class="tag-pasta">' + PASTA_SVG + esc(pasta.nome) + '</span>' : '') + '</div>' +
         '<div class="etapa" data-e="' + esc(p.etapa) + '"><div class="pontos" aria-hidden="true"><i></i><i></i><i></i></div><span>' + esc(ETAPAS[p.etapa] || p.etapa) + '</span></div>' +
-        '<div class="quando-p">Atualizado por ' + esc(p.atualizado_por) + '<b>' + esc(quando(p.atualizado_em)) + '</b></div>' +
+        '<div class="quem-p"><span>Feito por <b>' + esc(p.criado_por) + '</b> em ' + esc(quando(p.criado_em)) + '</span><span>Atualizado por ' + esc(p.atualizado_por) + ' em ' + esc(quando(p.atualizado_em)) + '</span></div>' +
         '<div class="acoes-p">' +
           (p.arquivado ? '' : '<button class="btn pequeno primario" type="button" data-acao="abrir">Abrir</button>') +
           '<button class="btn pequeno" type="button" data-acao="diagnostico">Diagnóstico (JSON)</button>' +
           (p.etapa === 'mapeamento' ? '<button class="btn pequeno" type="button" data-acao="mapa">Mapeamento (JSON)</button>' : '') +
-          '<button class="btn pequeno" type="button" data-acao="historico" aria-expanded="false">Histórico</button>' +
-          (eu && eu.papel === 'admin' ? '<button class="btn pequeno perigo" type="button" data-acao="arquivar">' + (p.arquivado ? 'Desarquivar' : 'Arquivar') + '</button>' : '') +
+          '<button class="btn pequeno" type="button" data-acao="historico" aria-expanded="false">Histórico e versões</button>' +
+          (p.arquivado ? '' : '<label class="sel-pasta"><span class="sr">Pasta do projeto ' + esc(p.nome) + '</span><select data-acao="pasta">' + opcoesPasta(pasta ? pasta.id : '') + '</select></label>') +
+          '<button class="btn pequeno' + (p.arquivado ? '' : ' perigo') + '" type="button" data-acao="arquivar">' + (p.arquivado ? 'Desarquivar' : 'Arquivar') + '</button>' +
         '</div></article>';
     }).join('');
   }
   $('busca').addEventListener('input', desenharProjetos);
   $('filtro-etapa').addEventListener('change', desenharProjetos);
-  $('ver-arquivados').addEventListener('change', carregarProjetos);
+  $('filtro-quem').addEventListener('change', desenharProjetos);
+  // pastas: escolher, criar, renomear e apagar (só vazia)
+  function formPasta(modo) {
+    modoPasta = modo;
+    $('form-pasta').hidden = !modo;
+    if (!modo) return;
+    var atual = pastas.filter(function (x) { return x.id === pastaAtual; })[0];
+    $('rotulo-pasta').textContent = modo === 'renomear' ? 'Novo nome da pasta' : 'Nome da nova pasta';
+    $('form-pasta-ok').textContent = modo === 'renomear' ? 'Renomear' : 'Criar pasta';
+    $('nome-pasta').value = modo === 'renomear' && atual ? atual.nome : '';
+    setTimeout(function () { $('nome-pasta').focus(); $('nome-pasta').select(); }, 30);
+  }
+  $('pastas').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'nova-pasta') { formPasta(modoPasta === 'criar' ? '' : 'criar'); return; }
+    pastaAtual = b.getAttribute('data-pasta') || ''; formPasta(''); desenharPastas(); desenharProjetos();
+  });
+  $('form-pasta-cancelar').addEventListener('click', function () { formPasta(''); });
+  $('renomear-pasta').addEventListener('click', function () { formPasta('renomear'); });
+  $('form-pasta').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nome = $('nome-pasta').value.trim(), b = $('form-pasta-ok');
+    if (!nome) { aviso('msg-projetos', 'Dê um nome para a pasta.', 'erro'); return; }
+    b.disabled = true;
+    var pedido = modoPasta === 'renomear' ? api('POST', 'pastas/' + pastaAtual + '/renomear', { nome: nome }) : api('POST', 'pastas', { nome: nome });
+    pedido.then(function (r) {
+      b.disabled = false; if (modoPasta === 'criar' && r.id) pastaAtual = r.id;
+      formPasta(''); aviso('msg-projetos', 'Pasta ' + nome + ' pronta.', 'ok'); carregarProjetos();
+    }, function (er) { b.disabled = false; aviso('msg-projetos', er.message, 'erro'); });
+  });
+  $('apagar-pasta').addEventListener('click', function () {
+    var b = this;
+    if (b.getAttribute('data-confirmar') !== '1') { b.setAttribute('data-confirmar', '1'); b.textContent = 'Confirmar: apagar a pasta'; setTimeout(function () { if (b.isConnected) { b.removeAttribute('data-confirmar'); b.textContent = 'Apagar pasta'; } }, 4000); return; }
+    b.removeAttribute('data-confirmar'); b.textContent = 'Apagar pasta'; b.disabled = true;
+    api('POST', 'pastas/' + pastaAtual + '/apagar').then(function () { b.disabled = false; pastaAtual = ''; aviso('msg-projetos', 'Pasta apagada.', 'ok'); carregarProjetos(); },
+      function (er) { b.disabled = false; aviso('msg-projetos', er.message, 'erro'); });
+  });
   var cacheProjeto = {};
   function projetoCompleto(id) {
     var resumo = projetos.filter(function (p) { return p.id === id; })[0];
@@ -561,15 +673,27 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     if (c && resumo && c.atualizado_em === resumo.atualizado_em) return Promise.resolve(c);
     return api('GET', 'projetos/' + id).then(function (p) { cacheProjeto[id] = p; return p; });
   }
+  $('lista-projetos').addEventListener('change', function (e) {
+    var sel = e.target.closest('select[data-acao="pasta"]'); if (!sel) return;
+    var id = sel.closest('.projeto').getAttribute('data-id'), nova = sel.value;
+    sel.disabled = true;
+    api('PUT', 'projetos/' + id + '/pasta', { pasta: nova }).then(function () {
+      var nome = (pastas.filter(function (x) { return x.id === nova; })[0] || {}).nome;
+      aviso('msg-projetos', nome ? 'Projeto guardado na pasta ' + nome + '.' : 'Projeto tirado da pasta.', 'ok'); carregarProjetos();
+    }, function (er) { sel.disabled = false; aviso('msg-projetos', er.message, 'erro'); });
+  });
   $('lista-projetos').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-acao]'); if (!b) return;
     var art = b.closest('.projeto'), id = art.getAttribute('data-id'), acao = b.getAttribute('data-acao');
     var resumo = projetos.filter(function (p) { return p.id === id; })[0] || {};
     if (acao === 'abrir') { abrirAnalise('analise.html?projeto=' + id); location.hash = 'analise'; return; }
+    if (acao === 'versao') { abrirAnalise('analise.html?projeto=' + id + '&versao=' + b.getAttribute('data-n')); location.hash = 'analise'; return; }
     if (acao === 'arquivar') {
-      if (b.getAttribute('data-confirmar') !== '1') { b.setAttribute('data-confirmar', '1'); b.textContent = 'Confirmar'; setTimeout(function () { if (b.isConnected) { b.removeAttribute('data-confirmar'); b.textContent = resumo.arquivado ? 'Desarquivar' : 'Arquivar'; } }, 4000); return; }
+      if (b.getAttribute('data-confirmar') !== '1') { b.setAttribute('data-confirmar', '1'); b.textContent = resumo.arquivado ? 'Confirmar: desarquivar' : 'Confirmar: arquivar'; setTimeout(function () { if (b.isConnected) { b.removeAttribute('data-confirmar'); b.textContent = resumo.arquivado ? 'Desarquivar' : 'Arquivar'; } }, 4000); return; }
       b.disabled = true;
-      api('POST', 'projetos/' + id + '/arquivar', { arquivar: !resumo.arquivado }).then(carregarProjetos, function (er) { b.disabled = false; aviso('msg-projetos', er.message, 'erro'); });
+      api('POST', 'projetos/' + id + '/arquivar', { arquivar: !resumo.arquivado }).then(function () {
+        aviso('msg-projetos', resumo.arquivado ? 'Projeto de volta à lista.' : 'Projeto arquivado: nada foi apagado, ele fica em Arquivados.', 'ok'); carregarProjetos();
+      }, function (er) { b.disabled = false; aviso('msg-projetos', er.message, 'erro'); });
       return;
     }
     if (acao === 'historico') {
@@ -585,9 +709,12 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
       if (acao === 'mapa' && p.mapa) baixar('mapa-onboarding-' + slug + '.json', p.mapa.dados);
       if (acao === 'historico') {
         var d = document.createElement('div'); d.className = 'detalhe';
-        var versoes = (p.versoes || []).length + (p.versoes_onboarding || []).length;
-        d.innerHTML = '<span class="ajuda">Criado por ' + esc(p.criado_por) + ' em ' + esc(quando(p.criado_em)) + (versoes ? ' · ' + versoes + ' versão(ões) anterior(es) guardada(s)' : '') + '</span>' +
-          '<ol>' + (p.historico || []).slice(0, 40).map(function (h) { return '<li><time datetime="' + esc(h.quando) + '">' + esc(quando(h.quando)) + '</time><span>' + esc(h.acao) + ' · ' + esc(h.quem) + '</span></li>'; }).join('') + '</ol>';
+        var vs = p.versoes || [], vo = (p.versoes_onboarding || []).length;
+        d.innerHTML = '<span class="ajuda">Feito por ' + esc(p.criado_por) + ' em ' + esc(quando(p.criado_em)) + ' · ' + vs.length + ' versão(ões) anterior(es) do diagnóstico' + (vo ? ' e ' + vo + ' do onboarding' : '') + ' guardada(s)</span>' +
+          (vs.length && !p.arquivado ? '<h4>Versões anteriores do diagnóstico</h4><ol class="versoes">' + vs.map(function (v, n) {
+            return '<li><time datetime="' + esc(v.quando) + '">' + esc(quando(v.quando)) + '</time><span>' + esc(v.quem || 'equipe') + '</span><button class="btn pequeno" type="button" data-acao="versao" data-n="' + n + '">Abrir esta versão</button></li>';
+          }).join('') + '</ol>' : '') +
+          '<h4>Histórico</h4><ol>' + (p.historico || []).slice(0, 60).map(function (h) { return '<li><time datetime="' + esc(h.quando) + '">' + esc(quando(h.quando)) + '</time><span>' + esc(h.acao) + ' · ' + esc(h.quem) + '</span></li>'; }).join('') + '</ol>';
         art.appendChild(d);
       }
     }, function (er) { b.disabled = false; aviso('msg-projetos', er.message, 'erro'); });

@@ -1,10 +1,13 @@
 // Regressão da API do start.win7.ai (ADR-008): contas por convite, sessão, limites, projetos salvos e equipe.
 // Roda contra uma instância descartável do PHP (start/testes/instancia.mjs). Uso: node start/testes/teste-api-abuso.mjs
 // Precisa de `npm run build` antes (o roteador serve dist/start) e do PHP 8 (no Windows, o do winget).
+import { spawnSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { subirInstancia } from './instancia.mjs';
+import { subirInstancia, comandoPhp } from './instancia.mjs';
+import { abrirCopia, conferirCopia } from './restaurar-copia.mjs';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 let falhas = 0, total = 0;
@@ -126,7 +129,34 @@ try {
   const g2 = await req('GET', `projetos/${id}`, { cookie: equipe });
   check(g2.j.versoes_onboarding.length === 1 && g2.j.versoes_onboarding[0].quem === 'Admin Teste' && g2.j.atualizado_por === 'Pessoa Equipe', 'outra pessoa no onboarding guarda a versão anterior');
   check((await req('GET', 'equipe', { cookie: equipe })).status === 403, 'equipe não gerencia a equipe (403)');
-  check((await req('POST', `projetos/${id}/arquivar`, { cookie: equipe, corpo: { arquivar: true } })).status === 403, 'equipe não arquiva projeto (403)');
+  // ---------------------------------------------------------------- pastas, quem fez, salvar e versões (18/11)
+  check((await req('POST', 'pastas', { cookie: equipe, corpo: { nome: '  ' } })).status === 400, 'pasta sem nome recusada');
+  const pa = await req('POST', 'pastas', { cookie: equipe, corpo: { nome: 'Onboardings de novembro' } });
+  check(pa.status === 200 && /^[a-f0-9]{12}$/.test(pa.j.id) && pa.j.criada_por === 'Pessoa Equipe', 'a equipe cria pasta (com o nome de quem criou)');
+  check((await req('POST', 'pastas', { cookie: admin, corpo: { nome: 'ONBOARDINGS DE NOVEMBRO' } })).status === 409, 'pasta com nome repetido recusada');
+  const pb = await req('POST', 'pastas', { cookie: admin, corpo: { nome: 'Antigos' } });
+  check((await req('GET', 'pastas', { cookie: equipe })).j.pastas.map((x) => x.nome).join() === 'Antigos,Onboardings de novembro', 'lista de pastas em ordem alfabética');
+  check((await req('POST', 'projetos', { cookie: equipe, corpo: { diagnostico: diagA2, logo, pasta: 'abcdefabcdef' } })).status === 400, 'salvar em pasta que não existe recusado');
+  const sv = await req('POST', 'projetos', { cookie: equipe, corpo: { id, diagnostico: diagA2, logo, pasta: pa.j.id } });
+  const gs = await req('GET', `projetos/${id}`, { cookie: equipe });
+  check(sv.status === 200 && sv.j.pasta === pa.j.id && gs.j.historico[0].acao === 'guardado na pasta Onboardings de novembro' && gs.j.historico[1].acao === 'diagnóstico salvo', 'botão Salvar sem mudança registra "diagnóstico salvo" e guarda na pasta escolhida');
+  const res = (await req('GET', 'projetos', { cookie: equipe })).j.projetos.find((x) => x.id === id);
+  check(res.pasta === pa.j.id && res.criado_por === 'Admin Teste' && res.atualizado_por === 'Pessoa Equipe', 'a lista mostra a pasta, quem fez e quem atualizou');
+  check((await req('POST', 'projetos', { cookie: equipe, corpo: { id, diagnostico: diagA2, logo } })).j.pasta === pa.j.id, 'salvar sem escolher pasta mantém a pasta');
+  check((await req('PUT', `projetos/${id}/pasta`, { cookie: equipe, corpo: { pasta: 'abcdefabcdef' } })).status === 400, 'mover para pasta inexistente recusado');
+  check((await req('PUT', `projetos/${id}/pasta`, { cookie: equipe, corpo: { pasta: pb.j.id } })).status === 200 && (await req('GET', 'projetos', { cookie: equipe })).j.projetos.find((x) => x.id === id).pasta === pb.j.id, 'mover o projeto de pasta');
+  check((await req('POST', `pastas/${pb.j.id}/apagar`, { cookie: equipe })).status === 409, 'pasta com projeto não é apagada');
+  check((await req('POST', `pastas/${pb.j.id}/renomear`, { cookie: equipe, corpo: { nome: 'Antigos 2025' } })).status === 200 && (await req('GET', 'pastas', { cookie: equipe })).j.pastas.some((x) => x.nome === 'Antigos 2025'), 'renomear pasta');
+  check((await req('POST', `pastas/${pa.j.id}/apagar`, { cookie: equipe })).status === 200 && !(await req('GET', 'pastas', { cookie: equipe })).j.pastas.some((x) => x.id === pa.j.id), 'pasta vazia apagada');
+  for (let i = 1; i <= 22; i++) await req('POST', 'projetos', { cookie: equipe, corpo: { id, diagnostico: { ...diagA, cliente: { ...diagA.cliente, cidade: 'Cidade ' + i } }, logo } });
+  const gv2 = await req('GET', `projetos/${id}?versoes=1`, { cookie: equipe });
+  check(gv2.j.versoes.length === 20 && gv2.j.versoes[0].diagnostico.cliente.cidade === 'Cidade 21', 'guarda as 20 versões anteriores do diagnóstico, a mais recente primeiro');
+  const alvo = gv2.j.versoes[5];
+  const volta = await req('POST', 'projetos', { cookie: equipe, corpo: { id, diagnostico: alvo.diagnostico, logo, versao_de: alvo.quando } });
+  const gvolta = await req('GET', `projetos/${id}`, { cookie: equipe });
+  check(volta.status === 200 && gvolta.j.diagnostico.cliente.cidade === alvo.diagnostico.cliente.cidade && /^voltou para a versão de \d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/.test(gvolta.j.historico[0].acao), 'abrir uma versão antiga e salvar volta o projeto para ela (e registra no histórico)');
+  check((await req('POST', `projetos/${id}/arquivar`, { cookie: equipe, corpo: { arquivar: true } })).status === 200 && (await req('GET', `projetos/${id}`, { cookie: equipe })).status === 200, 'a equipe arquiva (nada é apagado) e ainda abre o arquivado');
+  check((await req('GET', 'projetos?arquivados=1', { cookie: equipe })).j.projetos.some((x) => x.id === id && x.arquivado) && (await req('POST', `projetos/${id}/arquivar`, { cookie: equipe, corpo: { arquivar: false } })).status === 200, 'a equipe vê os arquivados e desarquiva');
   const eq = await req('GET', 'equipe', { cookie: admin });
   check(eq.j.usuarios.length === 2 && eq.j.usuarios.every((u) => !('hash' in u)), 'lista da equipe sem hash de senha');
   check((await req('POST', 'equipe/situacao', { cookie: admin, corpo: { email: 'admin@teste.local', ativo: false } })).status === 400, 'administrador não desativa a própria conta');
@@ -135,6 +165,29 @@ try {
 
   // ---------------------------------------------------------------- arquivar e sair
   check((await req('POST', `projetos/${p3.j.id}/arquivar`, { cookie: admin, corpo: { arquivar: true } })).status === 200, 'administrador arquiva projeto');
+  // ---------------------------------------------------------------- cópia do dia (cron do cPanel) para a tarefa Win7-BackupFora
+  const php = comandoPhp();
+  const cron = (args = []) => spawnSync(php.exe, [...php.args, path.join(RAIZ, 'start', 'api', 'lib', 'cron.php'), ...args], { env: { ...process.env, DADOS_DIR: inst.dados }, encoding: 'utf8', windowsHide: true });
+  check(/falta a chave-copia/.test(cron().stdout), 'sem a chave, o cron não gera cópia (e avisa)');
+  const chave = crypto.randomBytes(32);
+  fs.writeFileSync(path.join(inst.dados, 'chave-copia.txt'), chave.toString('base64'));
+  const c1 = JSON.parse(cron().stdout || '{}');
+  const pastaCopias = path.join(inst.dados, 'copias');
+  const enc = c1.copia?.arquivo ? path.join(pastaCopias, c1.copia.arquivo) : '';
+  check(enc && fs.existsSync(enc) && fs.existsSync(enc + '.sha256') && fs.existsSync(enc + '.b64.001'), 'o cron gera a cópia do dia cifrada, as partes em base64 e o .sha256');
+  if (enc) {
+    const bruto = fs.readFileSync(enc);
+    const partes = fs.readdirSync(pastaCopias).filter((f) => f.startsWith(c1.copia.arquivo + '.b64.')).sort();
+    const remontado = Buffer.from(partes.map((f) => fs.readFileSync(path.join(pastaCopias, f), 'utf8')).join(''), 'base64');
+    check(remontado.equals(bruto) && crypto.createHash('sha256').update(bruto).digest('hex') === fs.readFileSync(enc + '.sha256', 'utf8').trim(), 'as partes remontam o arquivo e o SHA-256 bate (como a tarefa baixa)');
+    check(bruto.subarray(0, 4).toString() === 'WCB1' && !bruto.includes(Buffer.from('Clínica Teste')) && !bruto.includes(Buffer.from('usuarios')), 'a cópia é ilegível sem a chave');
+    const copia = abrirCopia(bruto, chave), conf = conferirCopia(copia);
+    check(conf.projetos === 2 && conf.contas === 2 && conf.pastas === 1 && conf.problemas.length === 0 && !copia.arquivos['estado/sessoes.json'], 'decifrada com a chave: projetos, contas e pastas coerentes, sem as sessões');
+    let errada = false; try { abrirCopia(bruto, crypto.randomBytes(32)); } catch { errada = true; }
+    check(errada, 'com outra chave a cópia não abre');
+  }
+  check(/já existe/.test(cron().stdout) && JSON.parse(cron(['--forcar']).stdout).copia.arquivo, 'uma cópia por dia; --forcar gera outra');
+  check((await fetch(B + '/api/lib/cron.php')).status === 403, 'o cron não roda pela web');
   check((await req('GET', 'projetos', { cookie: admin })).j.projetos.length === 1 && (await req('GET', 'projetos?arquivados=1', { cookie: admin })).j.projetos.length === 2, 'arquivado sai da lista e volta com "mostrar arquivados"');
   check((await req('PUT', `projetos/${p3.j.id}/onboarding`, { cookie: admin, corpo: { respostas: respostas('x') } })).status === 404, 'projeto arquivado não recebe gravação');
   const sair = await req('POST', 'sair', { cookie: admin });

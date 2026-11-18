@@ -142,7 +142,7 @@ const HTACCESS_START = [
 /** A API do start vai junto do build, igual à fonte (start/api): o publicador envia o que está em dist/start. */
 function copiarApi(st) {
   const saida = [];
-  for (const rel of ['index.php', 'lib/base.php']) {
+  for (const rel of ['index.php', 'lib/base.php', 'lib/copia.php', 'lib/cron.php']) {
     const destino = path.join(st, 'api', rel);
     fs.mkdirSync(path.dirname(destino), { recursive: true });
     fs.copyFileSync(path.join(RAIZ, 'start', 'api', rel), destino);

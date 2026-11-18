@@ -58,6 +58,12 @@ label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(-
 .miniatura img { height: 44px; width: auto; max-width: 140px; object-fit: contain; border: 1px solid var(--linha); border-radius: 8px; background: #fff; padding: 4px; }
 .msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
 .msg.erro { color: var(--critico); } .msg.ok { color: var(--bom); }
+/* start.win7.ai: salvar no sistema, com a pasta (ADR-008) */
+.salvar-sistema { display: grid; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--linha-forte); }
+.linha-salvar { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.linha-salvar label { flex: 1 1 200px; min-width: 0; }
+select { width: 100%; font: inherit; font-size: 14px; color: var(--tinta); background: #fbfdfe; border: 1px solid var(--linha-forte); border-radius: 10px; padding: 9px 11px; min-height: 40px; }
+select:focus-visible { outline: 3px solid var(--w7-amarelo); outline-offset: 2px; }
 
 /* resultado */
 .barra-res { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }

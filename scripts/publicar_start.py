@@ -5,10 +5,15 @@ Cria, se faltar, o domínio adicional no cPanel da Win7 e o registro A com proxy
 (HTTPS pela Cloudflare, como modelo.win7.ai e previa.win7.ai). Cria a pasta de dados fora da pasta pública
 (start-cerebro-dados, na pasta da conta). Envia só o que mudou (páginas e a API em PHP) e confere no ar.
 
+Cópia do dia (ADR-008): garante a chave (.segredos/start-copia.env, fora do git; cópia no servidor em chave-copia.txt,
+0600, fora da pasta pública) e o cron do cPanel que roda api/lib/cron.php de hora em hora (gera uma cópia cifrada por dia).
+A tarefa Win7-BackupFora do computador baixa as cópias e sobe para o Drive cifrado.
+
 --convite-admin "Nome": gera um convite de administrador (vale 7 dias, uma vez, sem e-mail: a pessoa escreve o dela ao
 aceitar). Só o hash do token vai ao servidor; o link fica em .segredos/start-convites.txt (fora do git) e não é impresso.
 Credenciais em .segredos/credenciais.env (fora do git), lidas por servidor/cpanel.py e servidor/cloudflare.py.
 """
+import base64
 import hashlib
 import json
 import re
@@ -29,7 +34,9 @@ from publicar_pagina import garantir_addon, mkdir, pegar  # noqa: E402
 
 DOMINIO = "start.win7.ai"
 PASTA_DADOS = "start-cerebro-dados"  # na pasta da conta, fora da pasta pública do domínio
-PERMITIDO = {"index.html", "analise.html", "robo3.html", "robots.txt", ".htaccess", "api/index.php", "api/lib/base.php"}
+PERMITIDO = {"index.html", "analise.html", "robo3.html", "robots.txt", ".htaccess", "api/index.php", "api/lib/base.php", "api/lib/copia.php", "api/lib/cron.php"}
+PHP_CLI = "/opt/cpanel/ea-php83/root/usr/bin/php"  # o PHP da linha de comando do cPanel (EasyApache), o mesmo do GoogleX
+CHAVE_LOCAL = RAIZ / ".segredos" / "start-copia.env"
 
 
 def json_da_api(url):
@@ -41,6 +48,39 @@ def json_da_api(url):
         return e.code, None
     except Exception:
         return 0, None
+
+
+def garantir_chave_copia():
+    """A chave da cópia do dia: criada aqui uma vez, guardada em .segredos e enviada ao servidor se faltar lá."""
+    if not CHAVE_LOCAL.exists():
+        CHAVE_LOCAL.parent.mkdir(exist_ok=True)
+        CHAVE_LOCAL.write_text("# Chave da cópia do dia do start.win7.ai (ADR-008). GUARDE NO GERENCIADOR DE SENHAS: sem ela, a cópia não abre.\n"
+                               f"CHAVE={base64.b64encode(secrets.token_bytes(32)).decode()}\n", encoding="utf-8")
+        print("🔑 chave nova da cópia do dia em .segredos/start-copia.env (guarde no gerenciador de senhas)")
+    chave = next(l.split("=", 1)[1].strip() for l in CHAVE_LOCAL.read_text(encoding="utf-8").splitlines() if l.startswith("CHAVE="))
+    r = cpanel.uapi("Fileman", "list_files", dir=f"{cpanel.HOME}/{PASTA_DADOS}", show_hidden=1)
+    if "chave-copia.txt" in {f["file"] for f in (r.get("data") or [])}:
+        return
+    with tempfile.TemporaryDirectory() as tmp:
+        arq = Path(tmp) / "chave-copia.txt"
+        arq.write_text(chave, encoding="ascii")
+        ok, erros = cpanel.enviar(arq, PASTA_DADOS)
+        if not ok:
+            sys.exit(f"Falha ao enviar a chave da cópia: {erros}")
+    cpanel.api2("Fileman", "fileop", op="chmod", metadata="0600", sourcefiles=f"{cpanel.HOME}/{PASTA_DADOS}/chave-copia.txt")
+    print("🔑 chave da cópia do dia enviada ao servidor (0600, fora da pasta pública)")
+
+
+def garantir_cron():
+    """De hora em hora, aos 17 minutos: a cópia sai uma vez por dia; se uma rodada falhar, a próxima tenta de novo."""
+    atuais = cpanel.api2("Cron", "listcron").get("data", [])
+    if any(f"{DOMINIO}/api/lib/cron.php" in (c.get("command") or "") for c in atuais):
+        return
+    linha = f"{PHP_CLI} {cpanel.HOME}/{DOMINIO}/api/lib/cron.php >> {cpanel.HOME}/{PASTA_DADOS}/logs/cron.log 2>&1"
+    r = cpanel.api2("Cron", "add_line", command=linha, minute="17", hour="*", day="*", month="*", weekday="*")
+    if not ((r.get("data") or [{}])[0].get("status") or r.get("event", {}).get("result")):
+        sys.exit(f"Não consegui criar o cron da cópia do dia: {r.get('error') or r.get('data')}")
+    print("🕒 cron da cópia do dia criado (de hora em hora, aos 17 minutos; uma cópia por dia)")
 
 
 def convite_admin(nome):
@@ -95,6 +135,10 @@ def main():
         estado[a] = h
         print(f"⬆️  {a}")
     estado_arq.write_text(json.dumps(estado, indent=2) + "\n", encoding="utf-8")
+    cpanel.api2("Fileman", "mkdir", path=f"{cpanel.HOME}/{PASTA_DADOS}", name="logs", permissions="0750")
+    cpanel.api2("Fileman", "mkdir", path=f"{cpanel.HOME}/{PASTA_DADOS}", name="copias", permissions="0750")
+    garantir_chave_copia()
+    garantir_cron()
     if nome_convite:
         convite_admin(nome_convite)
     # conferência no ar: página, API e código interno fechado

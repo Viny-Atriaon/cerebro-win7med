@@ -45,4 +45,30 @@ Até aqui o start.win7.ai era estático: o diagnóstico vivia na aba do navegado
 - O porte deixa de ser "sem servidor": vale a auditoria do ambiente em execução (`scripts/audit-runtime.conf`) e a regressão de abuso (`start/testes/teste-api-abuso.mjs`, no `npm test`, no pre-push e na CI).
 - QA de ponta a ponta no navegador: `npm run qa:start`.
 - **LGPD:** o projeto guarda dados de empresa (nome, cidade, CNPJ, telefone e e-mail comercial, nome do RT) e o nome de quem da equipe mexeu. Nenhum dado de paciente. Acesso só da equipe convidada; retenção e cópia fora da HostGator entram na decisão de LGPD já pendente (CONFORMIDADE).
-- **Pendência:** a cópia do dia fica no próprio servidor. A cópia fora da HostGator (como a tarefa Win7-BackupFora faz com o GoogleX e o MetaX) depende de o Viny autorizar mexer nessa tarefa.
+- **Cópia fora da HostGator:** resolvida no adendo abaixo (18/11, autorizada pelo Viny).
+
+## Adendo · 18/11/2026 (tarde): organizar, voltar a uma versão e cópia fora do servidor
+Pedido do Viny: "Bota um botão de salvar, sei lá, arquivar, entendeu? Criar pastas, ou o nome de quem fez, algo assim, para identificar." E, sobre o backup: "pode colocar a parte do backup".
+1. **Pastas:** qualquer pessoa da equipe cria, renomeia e apaga (só a vazia). O projeto guarda o id da pasta.
+   - Na aba Projetos: chips Todos, cada pasta, Sem pasta e Arquivados, com a contagem; e um seletor de pasta em cada projeto.
+   - Na Análise: "Pasta no sistema", "Nova pasta" e o botão **Salvar no sistema**.
+2. **Quem fez:**
+   - cada projeto mostra "Feito por" e "Atualizado por", com data e hora;
+   - filtro "Feito por" na aba Projetos;
+   - o histórico registra salvar, guardar na pasta, arquivar e voltar de versão.
+3. **Salvar:**
+   - o Gerar continua salvando sozinho;
+   - o botão **Salvar no sistema** salva na hora, com a pasta escolhida; salvar sem mudança fica no histórico como "diagnóstico salvo";
+   - na apresentação, o botão **Salvar** grava as respostas na hora. Elas também salvam sozinhas a cada mudança.
+4. **Versões:**
+   - o sistema guarda as 20 versões anteriores do diagnóstico e as 10 do onboarding;
+   - em "Histórico e versões", **Abrir esta versão** mostra a versão antiga na Análise;
+   - **Salvar no sistema** volta o projeto para ela, e a versão atual também fica guardada.
+5. **Arquivar:** qualquer pessoa da equipe arquiva e desarquiva. Nada é apagado: o projeto vai para Arquivados e o histórico registra quem fez.
+6. **Cópia do dia, cifrada, fora da HostGator:**
+   - **No servidor:** o cron do cPanel roda `api/lib/cron.php` de hora em hora e gera uma vez por dia `copias/cerebro-AAAA-MM-DD-HHMMSS.json.gz.enc`.
+     - Formato WCB1: AES-256-GCM sobre o gzip de todos os projetos, contas e pastas.
+     - Vai com as partes em base64 e o `.sha256`, e o servidor guarda as 14 mais recentes.
+   - **A chave:** fica em `chave-copia.txt` (0600, fora da pasta pública) e em `.segredos/start-copia.env` no computador que publica. Precisa estar também no gerenciador de senhas.
+   - **No computador:** a tarefa Win7-BackupFora (`app/deploy/backup_fora.py` do GoogleX) baixa as cópias para `Documentos\Backups Win7\cerebro` (60 dias) e sobe para o Drive cifrado (90 dias). O Cérebro é opcional ali: a falha dele não derruba a cópia do GoogleX e do MetaX.
+   - **Ensaio de restauração:** `node start/testes/restaurar-copia.mjs <arquivo> [--para <pasta-vazia>]`.
