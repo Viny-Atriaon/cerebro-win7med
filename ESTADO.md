@@ -22,10 +22,11 @@
   - Nomes reais nos testes viraram lista de hashes.
   - O IP de origem e a pasta da conta saíram do código: vêm do cPanel, da Cloudflare ou das credenciais.
   - O pre-push recusa qualquer push que leve a história antiga para o público.
+  - Primeiro commit do público: `64b7b67` (PR-023). A história anterior termina em `1b0c054`, no histórico.
 - **Estado do sistema (18/11):**
   - `npm test`: Motor 1 ok, robô 3 com 60 checagens ok, API do start com 65 checagens ok.
   - `npm run qa:start`: ok, de ponta a ponta no navegador. Convite, Gerar, onboarding e mapeamento salvos; o projeto reabre em outro navegador sem nada guardado, com as respostas; 1440 e 375 px sem rolagem lateral e sem erro de console.
-  - `bash scripts/audit.sh .`: 24 ✅ · 0 ❌ · 4 ⚠️.
+  - `bash scripts/audit.sh .`: 24 ✅ · 0 ❌ · 4 ⚠️ (sem banco, carga e capacidade não medidas, auditoria de dependências só com `--deps`: ver CONFORMIDADE).
   - `npm run audit:runtime -- --abuse`: 8 ✅ · 0 ❌.
 
 ## O que existe

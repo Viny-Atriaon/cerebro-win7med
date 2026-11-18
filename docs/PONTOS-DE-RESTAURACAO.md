@@ -189,3 +189,13 @@
 - **Removido:** nada
 - **Motivo:** pedido do Viny em 18/11: a análise e o onboarding do dia não ficaram salvos
 - **Estado verificado neste ponto:** `npm test` = Motor 1 ok + robô 3 60 ok + API 65 ok; `qa_start.py` ok (projeto reaberto em outro navegador com as respostas; 1440 e 375 px sem rolagem lateral nem erro de console); no ar: página 200, `/api/saude` 200, `api/lib` 403; `audit-runtime.sh --abuse` = 8 ✅ · 0 ❌
+
+## PR-023 · 18/11/2026 · Repositório público com história nova (ADR-009)
+- **Commit:** `64b7b67` (primeiro commit do público; a história anterior termina em `1b0c054` no `cerebro-win7med-historico`) · **Tipo:** modificado
+- **Funcionalidades tocadas:** documentos (saneados), `servidor/cpanel.py` (`home()`), `servidor/cloudflare.py` (`ip_servidor()`), publicadores, `teste-regressao.mjs` (`PROIBIDOS` por hash), `.githooks/pre-push` (trava da história privada), `start/testes/regressao-abuso.sh`
+- **Adicionado:** ADR-009; `.githooks/raiz-privada`; chaves opcionais `CPANEL_HOME` e `SERVIDOR_IP` no `credenciais.env`
+- **Modificado:** `Viny-Atriaon/cerebro-win7med` agora é público, com um commit órfão; o repositório antigo virou `cerebro-win7med-historico` (privado); commits do público com o e-mail noreply do GitHub
+- **Removido:** do repositório público, nomes e pastas de clientes reais, links com token, dados da equipe, painel com token, IP de origem e pasta da conta do servidor
+- **Motivo:** pedido do Viny em 18/11: o cérebro precisa ser público para os colaboradores usarem, sem depender de quem tem acesso
+- **Estado verificado neste ponto:** varredura de termos sensíveis em todos os arquivos publicados sem ocorrência; `npm test` = Motor 1 ok + robô 3 60 ok + API 65 ok; `bash scripts/audit.sh .` = 24 ✅ · 0 ❌ · 4 ⚠️; pre-push recusou de propósito um envio com a história antiga para o público e aceitou o histórico privado
+
