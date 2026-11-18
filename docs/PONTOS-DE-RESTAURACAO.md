@@ -199,3 +199,12 @@
 - **Motivo:** pedido do Viny em 18/11: o cérebro precisa ser público para os colaboradores usarem, sem depender de quem tem acesso
 - **Estado verificado neste ponto:** varredura de termos sensíveis em todos os arquivos publicados sem ocorrência; `npm test` = Motor 1 ok + robô 3 60 ok + API 65 ok; `bash scripts/audit.sh .` = 24 ✅ · 0 ❌ · 4 ⚠️; pre-push recusou de propósito um envio com a história antiga para o público e aceitou o histórico privado
 
+## PR-024 · 18/11/2026 · Pastas, quem fez, salvar, versões e cópia do dia fora da HostGator (adendo ADR-008)
+- **Commit:** `25fd36f` · **Tipo:** adicionado
+- **Funcionalidades tocadas:** `start/api/index.php` (pastas, pasta do projeto, `versao_de`, arquivar por toda a equipe, 20/10 versões), `start/api/lib/copia.php` e `cron.php` (novos), `start/index.html` (aba Projetos), `gerador.js`, `gerador.html` e `gerador.css` (Salvar no sistema, pasta, abrir versão), `apresentacao.js` (botão Salvar), `publicar_start.py` (chave e cron), `start/testes/` (restaurar-copia.mjs, 89 checagens, QA)
+- **Adicionado:** pastas; "Feito por" e filtro; botão Salvar no sistema e Salvar na apresentação; Abrir esta versão; cópia diária cifrada WCB1 com partes e SHA-256; ensaio de restauração; terceira origem na tarefa Win7-BackupFora (GoogleX `489a611`)
+- **Modificado:** arquivar deixa de ser só do administrador (nada é apagado); LGPD adiada pelo Owner até 18/02/2027
+- **Removido:** a caixa "Mostrar arquivados" (virou a pasta Arquivados)
+- **Motivo:** pedido do Viny em 18/11: salvar, arquivar, pastas e o nome de quem fez para identificar; backup autorizado
+- **Estado verificado neste ponto:** `npm test` = Motor 1 ok + robô 3 60 ok + API 89 ok; `qa_start.py` ok (pasta pela Análise, Salvar no sistema, Salvar na apresentação, versão aberta e restaurada, 1440 e 375 px sem rolagem lateral nem erro de console); `bash scripts/audit.sh .` = 24 ✅ · 0 ❌ · 4 ⚠️; no ar: página 200, API 200, `api/lib/*` 403, cron criado, chave 0600
+

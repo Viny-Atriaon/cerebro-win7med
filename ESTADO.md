@@ -4,6 +4,19 @@
 > **Repositório público** (ADR-009): este arquivo não leva nome de cliente, pasta de cliente, link com token, dado da equipe nem endereço do servidor. O estado de cada cliente real fica na pasta do cliente (fora do git, `LEIA-PRIMEIRO.md` ou `ESTADO.md` de lá) e nos projetos salvos do start.win7.ai. A história até 18/11/2026 (PR-001 a PR-022, com os clientes reais) está no repositório privado `Viny-Atriaon/cerebro-win7med-historico`.
 
 ## Último checkpoint
+- **Organizar e voltar a uma versão (18/11 tarde, adendo da ADR-008, pedido do Viny):**
+  - **Pastas:** qualquer pessoa da equipe cria e organiza. Chips na aba Projetos, seletor em cada projeto e, na Análise, "Pasta no sistema" e "Nova pasta".
+  - **Quem fez:** "Feito por" e "Atualizado por" em cada projeto, com filtro "Feito por".
+  - **Salvar:** botão **Salvar no sistema** na Análise e **Salvar** na apresentação.
+  - **Versões:** 20 do diagnóstico e 10 do onboarding. **Abrir esta versão** e salvar volta o projeto para ela.
+  - **Arquivar:** qualquer pessoa arquiva e desarquiva; nada é apagado.
+  - Commit `25fd36f`, PR-024; publicado em 18/11.
+- **Cópia do dia fora da HostGator (18/11, autorizada pelo Viny):**
+  - **No servidor:** o cron do cPanel roda `api/lib/cron.php` de hora em hora, aos 17 minutos, e gera uma cópia por dia cifrada (WCB1) em `start-cerebro-dados/copias`.
+  - **A chave:** fica em `.segredos/start-copia.env` (fora do git; precisa ir para o gerenciador de senhas) e no servidor (0600).
+  - **No computador:** a tarefa Win7-BackupFora (GoogleX, commit `489a611`) baixa para `Documentos\Backups Win7\cerebro` e sobe para o Drive cifrado.
+  - **Ensaio:** `node start/testes/restaurar-copia.mjs`.
+- **LGPD adiada pelo Viny (18/11):** é análise interna, não é exposta ao público e não trata dado sensível. Reavaliar até 18/02/2027 (CONFORMIDADE).
 - **Projetos salvos no start.win7.ai (18/11, ADR-008, pedido do Viny):** o diagnóstico e o onboarding de um cliente não ficavam salvos. Agora:
   - **Servidor pequeno em PHP** no cPanel da Win7 (`start/api/`), dados em JSON fora da pasta pública (`start-cerebro-dados`, na pasta da conta).
   - **Acesso por pessoa, por convite:** papéis equipe e administrador; sessão, limites de login e escrita só do próprio site.
@@ -24,7 +37,7 @@
   - O pre-push recusa qualquer push que leve a história antiga para o público.
   - Primeiro commit do público: `64b7b67` (PR-023). A história anterior termina em `1b0c054`, no histórico.
 - **Estado do sistema (18/11):**
-  - `npm test`: Motor 1 ok, robô 3 com 60 checagens ok, API do start com 65 checagens ok.
+  - `npm test`: Motor 1 ok, robô 3 com 60 checagens ok, API do start com 89 checagens ok (pastas, versões, cópia cifrada do dia).
   - `npm run qa:start`: ok, de ponta a ponta no navegador. Convite, Gerar, onboarding e mapeamento salvos; o projeto reabre em outro navegador sem nada guardado, com as respostas; 1440 e 375 px sem rolagem lateral e sem erro de console.
   - `bash scripts/audit.sh .`: 24 ✅ · 0 ❌ · 4 ⚠️ (sem banco, carga e capacidade não medidas, auditoria de dependências só com `--deps`: ver CONFORMIDADE).
   - `npm run audit:runtime -- --abuse`: 8 ✅ · 0 ❌.
@@ -41,13 +54,12 @@
 
 ## Próximos 3 passos (concretos, executáveis)
 1. O Viny abre o link de `.segredos/start-convites.txt`, cria o acesso (e-mail dele e senha) e convida a equipe pela aba Equipe.
-2. Cópia dos projetos do start fora da HostGator, cifrada, como a tarefa Win7-BackupFora faz com o GoogleX e o MetaX. Depende da autorização do Viny para mexer nessa tarefa (CONFORMIDADE, prazo 18/12/2026).
-3. Retenção dos projetos e das transcrições: decisão de LGPD pendente do Viny (CONFORMIDADE).
+2. O Viny guarda a chave da cópia do dia (`.segredos/start-copia.env`) no gerenciador de senhas.
+3. Ensaio de restauração uma vez por mês, com a cópia mais recente de `Documentos\Backups Win7\cerebro`.
 
 ## Bloqueios / pendências
 - P-01 e P-02 (AGENTS.md): prospect e transcrição reais para fechar as fases F2 e F7.
-- LGPD: retenção dos projetos salvos, dos dossiês e das transcrições. Decisão do Viny (CONFORMIDADE).
-- Cópia fora da HostGator dos projetos do start (CONFORMIDADE).
+- LGPD: adiada pelo Viny em 18/11/2026; reavaliar até 18/02/2027 (CONFORMIDADE).
 - CONSELHO-02 em aberto para o Viny:
   - aceite com 3 onboardings reais em até 60 minutos;
   - uma pessoa responsável pela manutenção, que não seja o Viny;
