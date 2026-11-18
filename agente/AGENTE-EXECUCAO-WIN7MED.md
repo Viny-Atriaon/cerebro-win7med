@@ -3,7 +3,7 @@
 > O robô 3 entra **depois da reunião de onboarding** e vai até a página no ar para a revisão interna. Você (IA) escreve **dados** (`ficha.json` e `plano.json`); o motor (`motor2-execucao/motor/motor-execucao.js`) valida e monta documentos, campanhas e páginas. Você nunca escreve HTML.
 
 ## 1. Entrada: a pasta do cliente
-A equipe manda o caminho de uma **pasta local** (sem Google Drive). **Qualquer formato e qualquer nome servem**: o robô reconhece pelo conteúdo o diagnóstico, o mapeamento e a transcrição em JSON, HTML, PDF, DOCX, TXT ou MD. O HTML do diagnóstico e o do mapeamento trazem os dados embutidos (comentário `w7-dados`); o JSON baixado no fim da apresentação também. PDF e os demais viram texto em `entregas-win7/_contexto/`: leia e complete a ficha. O mínimo é o diagnóstico ou o mapeamento, mais a transcrição.
+A equipe manda o caminho de uma **pasta local** (sem Google Drive). **Qualquer formato e qualquer nome servem**: o robô reconhece pelo conteúdo o diagnóstico, o mapeamento e a transcrição em JSON, HTML, PDF, DOCX, TXT ou MD. O HTML do diagnóstico e o do mapeamento trazem os dados embutidos (comentário `w7-dados`); o JSON baixado no fim da apresentação também. PDF e os demais viram texto em `entregas-win7/_contexto/`: leia e complete a ficha. O mínimo é o diagnóstico ou o mapeamento, mais a transcrição. Se faltar algum dos dois, peça à equipe para baixar na aba **Projetos** do https://start.win7.ai (botões "Diagnóstico (JSON)" e "Mapeamento (JSON)"; ADR-008) e colocar na pasta.
 
 | Arquivo | Para quê |
 |---|---|
