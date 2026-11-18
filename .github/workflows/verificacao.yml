@@ -1,0 +1,23 @@
+name: Verificação (padrão v3.5)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  constituicao:
+    name: Constituição, auditoria do código e regressão (bloqueia)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Auditoria do código
+        run: bash scripts/audit.sh .
+      - name: Regressão do Motor 1 (motor, agente e privacidade)
+        run: node motor1-diagnostico/scripts/teste-regressao.mjs
+      - name: Regressão do robô 3 (ficha, plano, campanhas, página real)
+        run: node motor2-execucao/scripts/teste-robo3.mjs
+      - name: Regressão da API do start.win7.ai (PHP, contas, limites, projetos salvos)
+        run: php -v && php -m | grep -qi mbstring && node start/testes/teste-api-abuso.mjs

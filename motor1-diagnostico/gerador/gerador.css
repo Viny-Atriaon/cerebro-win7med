@@ -1,0 +1,99 @@
+/* Gerador do Laudo · Win7 Med
+   Ferramenta de trabalho da equipe: entrada à esquerda, laudo à direita. Tema claro e único, de propósito,
+   na mesma paleta do laudo (petróleo da logo + as quatro cores do 7). */
+:root {
+  --petroleo: #0b4f6c;
+  --petroleo-fundo: #082f44;
+  --petroleo-claro: #1e88b8;
+  --tinta: #0e1a22;
+  --texto: #3b5160;
+  --apagado: #6f8593;
+  --fundo: #eef3f6;
+  --cartao: #ffffff;
+  --linha: #d7e2e8;
+  --linha-forte: #b9cad3;
+  --w7-amarelo: #f5b71a;
+  --w7-vermelho: #e23b3b;
+  --w7-verde: #27a548;
+  --w7-azul: #2f7cc1;
+  --bom: #1f8a3c; --bom-fundo: #e6f4ea;
+  --atencao: #8a5f00; --atencao-fundo: #fdf3d8;
+  --critico: #b52a2a; --critico-fundo: #fbe7e7;
+  --fonte: "Outfit", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { background: var(--fundo); color: var(--tinta); font-family: var(--fonte); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+.faixa-marca { display: flex; height: 5px; } .faixa-marca span { flex: 1; }
+.faixa-marca .a { background: var(--w7-amarelo); } .faixa-marca .v { background: var(--w7-vermelho); } .faixa-marca .g { background: var(--w7-verde); } .faixa-marca .b { background: var(--w7-azul); }
+.topo { background: var(--cartao); border-bottom: 1px solid var(--linha); padding-inline: 20px; padding-block: 12px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.topo img { height: 52px; width: auto; }
+.topo h1 { font-size: 20px; line-height: 1.2; font-weight: 700; }
+.topo .sub { font-size: 13px; color: var(--apagado); }
+.app { display: grid; grid-template-columns: minmax(0, 430px) minmax(0, 1fr); gap: 18px; padding-inline: 18px; padding-block: 18px 30px; max-width: 1680px; margin: 0 auto; align-items: start; }
+.coluna { display: grid; gap: 14px; min-width: 0; }
+.cartao { background: var(--cartao); border: 1px solid var(--linha); border-radius: 14px; padding: 18px; min-width: 0; }
+.passo { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; }
+.passo .n { width: 30px; height: 30px; border-radius: 50%; background: var(--petroleo); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.passo h2 { font-size: 16.5px; line-height: 1.3; font-weight: 700; margin-bottom: 4px; }
+.passo p, .ajuda { font-size: 13.5px; color: var(--texto); }
+.ajuda { color: var(--apagado); }
+.acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+button, .botao { font: inherit; font-size: 14px; font-weight: 700; border-radius: 10px; padding: 9px 14px; min-height: 40px; cursor: pointer; border: 1px solid var(--linha-forte); background: var(--cartao); color: var(--petroleo); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+button:hover, .botao:hover { border-color: var(--petroleo); }
+button.primario { background: var(--petroleo); border-color: var(--petroleo); color: #fff; }
+button.primario:hover { background: var(--petroleo-fundo); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button:focus-visible, .botao:focus-visible, textarea:focus-visible, input:focus-visible { outline: 3px solid var(--w7-amarelo); outline-offset: 2px; }
+textarea, input[type="text"], input[type="url"] { width: 100%; font: inherit; font-size: 14px; color: var(--tinta); background: #fbfdfe; border: 1px solid var(--linha-forte); border-radius: 10px; padding: 9px 11px; }
+textarea { font-family: var(--mono); font-size: 12.5px; min-height: 190px; resize: vertical; margin-top: 10px; }
+label { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--texto); }
+.campos { display: grid; gap: 10px; margin-top: 12px; }
+.arquivo { position: relative; overflow: hidden; }
+.arquivo input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.miniatura { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; color: var(--texto); }
+.miniatura img { height: 44px; width: auto; max-width: 140px; object-fit: contain; border: 1px solid var(--linha); border-radius: 8px; background: #fff; padding: 4px; }
+.msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
+.msg.erro { color: var(--critico); } .msg.ok { color: var(--bom); }
+
+/* resultado */
+.barra-res { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.placar-mini { display: flex; align-items: baseline; gap: 6px; padding-right: 14px; border-right: 1px solid var(--linha); }
+.placar-mini .v { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1; }
+.placar-mini .d { font-size: 13px; color: var(--apagado); }
+.placar-mini .c { font-size: 14px; font-weight: 700; }
+.v.bom { color: var(--bom); } .v.atencao { color: var(--atencao); } .v.critico { color: var(--critico); }
+.barra-res .acoes { margin: 0; margin-left: auto; }
+.listas { display: grid; gap: 8px; margin-top: 14px; }
+.lista-val { list-style: none; display: grid; gap: 6px; font-size: 13.5px; }
+.lista-val li { padding: 8px 12px; border-radius: 8px; }
+.lista-val.erros li { background: var(--critico-fundo); color: var(--critico); font-weight: 700; }
+.lista-val.avisos li { background: var(--atencao-fundo); color: var(--atencao); }
+.lista-val.oks { display: flex; flex-wrap: wrap; gap: 6px; }
+.lista-val.oks li { background: var(--bom-fundo); color: var(--bom); font-weight: 700; padding: 4px 10px; border-radius: 99px; font-size: 12.5px; }
+.vazio { display: grid; place-items: center; text-align: center; gap: 8px; padding: 36px 16px; color: var(--apagado); }
+.vazio strong { color: var(--tinta); font-size: 17px; }
+.previa-cab { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.previa-cab h2 { font-size: 15.5px; }
+.alterna { display: inline-flex; border: 1px solid var(--linha-forte); border-radius: 10px; overflow: hidden; }
+.alterna button { border: 0; border-radius: 0; min-height: 36px; padding: 6px 12px; }
+.alterna button[aria-pressed="true"] { background: var(--petroleo); color: #fff; }
+.moldura { background: #dfe8ed; border-radius: 12px; padding: 10px; display: flex; justify-content: center; overflow: auto; }
+#previa { width: 100%; height: 78vh; min-height: 520px; border: 0; border-radius: 8px; background: #fff; box-shadow: 0 6px 24px rgba(8,47,68,0.12); }
+#previa.celular { width: 390px; max-width: 100%; }
+.rodape { text-align: center; font-size: 12.5px; color: var(--apagado); padding-inline: 16px; padding-block: 6px 26px; }
+.rodape a { color: var(--petroleo); }
+@media (max-width: 1100px) {
+  .app { grid-template-columns: 1fr; }
+  #previa { height: 70vh; }
+}
+@media (max-width: 520px) {
+  .barra-res .acoes { margin-left: 0; }
+  .placar-mini { border-right: 0; }
+}
+
+/* Dentro do start.win7.ai (tela única): a barra do start já mostra a marca */
+.embutido .faixa-marca, .embutido header.topo, .embutido .so-fora { display: none !important; }

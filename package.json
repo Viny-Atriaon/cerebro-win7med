@@ -1,0 +1,23 @@
+{
+  "name": "cerebro-win7med",
+  "version": "0.6.0",
+  "private": true,
+  "description": "Cérebro Win7 Med: Motor 1 (diagnóstico) e Motor 2 (planejamento e criação) para clientes novos da Win7 Med",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node motor1-diagnostico/scripts/teste-regressao.mjs && node motor2-execucao/scripts/teste-robo3.mjs && node start/testes/teste-api-abuso.mjs",
+    "robo3": "node motor2-execucao/scripts/robo3.mjs",
+    "publicar:start": "node scripts/build.mjs && python -X utf8 scripts/publicar_start.py dist/start",
+    "build": "node scripts/build.mjs",
+    "gerar": "node motor1-diagnostico/scripts/gerar.mjs",
+    "audit": "bash scripts/audit.sh .",
+    "golden": "node motor1-diagnostico/scripts/teste-regressao.mjs --atualizar-referencia",
+    "test:start": "node start/testes/teste-api-abuso.mjs",
+    "qa:start": "node scripts/build.mjs && python -X utf8 start/testes/qa_start.py saida/qa-start",
+    "audit:runtime": "bash scripts/audit-runtime.sh scripts/audit-runtime.conf"
+  },
+  "license": "UNLICENSED"
+}

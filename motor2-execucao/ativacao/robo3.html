@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robô 3 · Cérebro Win7 Med</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+/*{{FONTES}}*/
+:root{--petroleo:#0b4f6c;--fundo-escuro:#082f44;--tinta:#0e1a22;--texto:#3b5160;--apagado:#6f8594;--linha:#d7e2e8;--fundo:#f1f5f7;--ok:#1f8a3c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Outfit","Segoe UI",Arial,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.55;-webkit-font-smoothing:antialiased}
+.faixa{display:flex;height:6px}.faixa i{flex:1}.faixa i:nth-child(1){background:#f5b71a}.faixa i:nth-child(2){background:#e23b3b}.faixa i:nth-child(3){background:#27a548}.faixa i:nth-child(4){background:#2f7cc1}
+header{background:#fff;border-bottom:1px solid var(--linha)}
+header .in{width:min(860px,100% - 32px);margin-inline:auto;display:flex;align-items:center;gap:18px;padding-block:16px}
+header img{height:46px;width:auto}
+header h1{font-size:1.35rem;line-height:1.2}
+header p{color:var(--texto);font-size:.95rem}
+main{width:min(860px,100% - 32px);margin-inline:auto;padding-block:28px 48px;display:grid;gap:16px}
+.cartao{background:#fff;border:1px solid var(--linha);border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 16px}
+.n{grid-row:span 3;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--petroleo);color:#fff;font-weight:700}
+h2{font-size:1.15rem;line-height:1.3}
+.cartao p,.cartao ul{color:var(--texto)}
+.cartao ul{padding-left:20px;margin-top:4px}
+.acoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+button{font:inherit;font-weight:700;font-size:1rem;padding:12px 20px;border-radius:12px;border:0;background:var(--petroleo);color:#fff;cursor:pointer}
+button:hover{background:var(--fundo-escuro)}
+.msg{margin-top:8px;font-weight:600;color:var(--ok);min-height:1.5em}
+pre{white-space:pre-wrap;font-family:inherit;font-size:.95rem;background:var(--fundo);border:1px dashed var(--linha);border-radius:12px;padding:12px 14px;margin-top:12px;color:var(--tinta);overflow-wrap:anywhere}
+footer{width:min(860px,100% - 32px);margin-inline:auto;padding-bottom:28px;color:var(--apagado);font-size:.85rem}
+.embutido .faixa,.embutido header,.embutido footer{display:none}
+.embutido main{padding-top:24px}
+@media (max-width:560px){.cartao{grid-template-columns:1fr}.n{grid-row:auto}header .in{flex-wrap:wrap}}
+</style>
+<script>if (window.self !== window.top) document.documentElement.classList.add('embutido');</script>
+</head>
+<body>
+<div class="faixa" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<header><div class="in"><img src="{{LOGO}}" alt="Win7 Med"><div><h1>Robô 3 · execução do projeto</h1><p>Depois da reunião de onboarding: ficha, copy, roteiro, Google Ads e páginas</p></div></div></header>
+<main>
+  <section class="cartao">
+    <span class="n">1</span>
+    <h2>Copie o comando inicial</h2>
+    <p>Cole numa conversa nova do Claude Code e envie. O robô 3 é ativado na hora.</p>
+    <div>
+      <div class="acoes"><button type="button" id="copiar">Copiar comando inicial</button></div>
+      <p class="msg" id="msg" role="status"></p>
+      <pre id="comando">{{COMANDO}}</pre>
+    </div>
+  </section>
+  <section class="cartao">
+    <span class="n">2</span>
+    <h2>Passe o endereço da pasta do cliente</h2>
+    <p>O robô pede o caminho da pasta no computador (não use o Google Drive). Qualquer formato serve: JSON, HTML, PDF, DOCX ou TXT, com qualquer nome. A pasta tem:</p>
+    <ul><li>o diagnóstico (o HTML ou o PDF baixado da análise, ou os dados em JSON);</li><li>o mapeamento da reunião (o PDF, o HTML ou o JSON baixado no fim da apresentação);</li><li>a transcrição da reunião do Gemini (PDF, DOCX ou TXT);</li><li>a logo e, se houver, os vídeos e a pasta <code>convenios</code>.</li></ul>
+  </section>
+  <section class="cartao">
+    <span class="n">3</span>
+    <h2>Aprove em dois pontos</h2>
+    <p>Primeiro a ficha do cliente. Depois a prévia das páginas, com a copy, os roteiros e o planejamento de Google Ads. Só então o robô publica no domínio.</p>
+  </section>
+</main>
+<footer>Cérebro Win7 Med · uso interno</footer>
+<script>
+(function () {
+  var texto = document.getElementById('comando').textContent, msg = document.getElementById('msg');
+  function manual() {
+    var r = document.createRange(); r.selectNodeContents(document.getElementById('comando'));
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    msg.textContent = ok ? 'Comando copiado. Cole numa conversa nova do Claude Code.' : 'Texto selecionado: copie com Ctrl+C.';
+  }
+  document.getElementById('copiar').addEventListener('click', function () {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(function () { msg.textContent = 'Comando copiado. Cole numa conversa nova do Claude Code.'; }, manual);
+    else manual();
+  });
+})();
+</script>
+</body>
+</html>

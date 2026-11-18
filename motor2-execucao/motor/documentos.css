@@ -1,0 +1,63 @@
+/* Documentos do robô 3 (ficha, landing page formatada, roteiro, Google Ads) · identidade Win7 Med.
+   Petróleo da linha "Imagem", as quatro cores do 7 e a fonte Outfit. Feitos para virar PDF A4 (Chromium). */
+:root {
+  --petroleo: #0b4f6c; --petroleo-fundo: #082f44; --tinta: #0e1a22; --texto: #3b5160; --apagado: #6f8594;
+  --linha: #d7e2e8; --fundo: #f1f5f7; --amarelo: #f5b71a; --vermelho: #e23b3b; --verde: #27a548; --azul: #2f7cc1;
+  --ok: #1f8a3c; --ok-fundo: #e6f4ea; --conf: #8a5a00; --conf-fundo: #fdf3d8; --nao: #b42323; --nao-fundo: #fbe7e7;
+  color-scheme: light;
+}
+@page { size: A4; margin: 14mm 14mm 16mm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body.doc { font-family: "Outfit", "Segoe UI", Arial, sans-serif; color: var(--tinta); font-size: 11.5pt; line-height: 1.5; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.doc-topo { background: var(--petroleo-fundo); color: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 12px; break-inside: avoid; }
+.faixa7 { display: flex; height: 5px; } .faixa7 i { flex: 1; }
+.faixa7 i:nth-child(1) { background: var(--amarelo); } .faixa7 i:nth-child(2) { background: var(--vermelho); } .faixa7 i:nth-child(3) { background: var(--verde); } .faixa7 i:nth-child(4) { background: var(--azul); }
+.doc-topo-in { display: flex; align-items: center; gap: 18px; padding: 13px 20px; }
+.doc-topo-in img { height: 40px; width: auto; flex: none; }
+.doc-topo h1 { font-size: 19pt; line-height: 1.15; font-weight: 700; }
+.doc-topo p { color: rgba(255,255,255,.8); font-size: 10.5pt; margin-top: 2px; }
+.doc-corpo section { margin-top: 16px; }
+.doc-corpo h2 { font-size: 13.5pt; color: var(--petroleo); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; break-after: avoid; }
+.doc-corpo h3 { font-size: 11.5pt; color: var(--tinta); margin: 12px 0 6px; break-after: avoid; }
+.doc-corpo p + p { margin-top: 6px; }
+.doc-corpo ul, .doc-corpo ol { padding-left: 20px; }
+.doc-corpo li { margin-top: 3px; }
+.n { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 8px; border-radius: 999px; background: var(--petroleo); color: #fff; font-size: 10pt; }
+.mod, .bloco, .grupo { border: 1px solid var(--linha); border-radius: 10px; padding: 12px 14px; break-inside: avoid; }
+.mod dl { display: grid; grid-template-columns: 190px 1fr; gap: 4px 12px; margin-top: 8px; }
+.mod dt { color: var(--apagado); font-size: 10pt; } .mod dd { font-weight: 600; }
+.h1 { font-size: 16pt; font-weight: 700; color: var(--petroleo-fundo); letter-spacing: .01em; }
+.sub { font-size: 12pt; margin-top: 4px; }
+.pontos { margin-top: 6px; } .pontos li::marker { color: var(--verde); }
+.t { font-weight: 700; margin-top: 2px; }
+.kw { font-size: 10pt; color: var(--texto); line-height: 1.6; }
+.lead { font-size: 10.5pt; color: var(--texto); margin-bottom: 2px; }
+.bloco { margin-top: 6px; padding: 6px 12px; }
+.bloco h2 { font-size: 11pt; margin-bottom: 2px; } .tempo { margin-left: auto; color: var(--apagado); font-size: 10pt; font-weight: 600; }
+.fala { font-size: 11.5pt; font-weight: 600; line-height: 1.35; } .cena { color: var(--apagado); font-size: 10pt; margin-top: 4px; }
+.nota { color: var(--apagado); font-size: 10pt; margin-top: 8px; }
+.cit { color: var(--apagado); font-size: 9.5pt; font-style: italic; margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; font-size: 10.5pt; }
+th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--linha); }
+.fatos th { width: 34%; color: var(--texto); font-weight: 600; }
+.check th { background: var(--fundo); color: var(--texto); font-weight: 700; }
+tr { break-inside: avoid; }
+.st { display: inline-block; font-size: 9pt; font-weight: 700; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.st.ok { background: var(--ok-fundo); color: var(--ok); } .st.conf { background: var(--conf-fundo); color: var(--conf); } .st.nao { background: var(--nao-fundo); color: var(--nao); }
+.msg { white-space: pre-wrap; font-family: inherit; font-size: 10.5pt; background: var(--fundo); border-radius: 8px; padding: 10px 12px; break-inside: avoid; }
+.grupo { margin-top: 10px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 4px 16px; } .grupo h3, .grupo .url { grid-column: 1 / -1; margin-top: 0; } .url { color: var(--azul); font-size: 10pt; }
+.grupo .kw { font-size: 9.5pt; } .anuncio { font-size: 9.5pt; }
+.tit, .des { font-size: 9.5pt; margin-top: 0; } .des { margin-top: 6px; } .cc { color: var(--apagado); font-size: 8.5pt; }
+.quebra { break-before: page; }
+.doc-rodape { margin-top: 10px; padding-top: 6px; border-top: 1px solid var(--linha); color: var(--apagado); font-size: 9pt; }
+@media screen { body.doc { max-width: 860px; margin: 24px auto; padding: 0 16px; } }
+
+/* roteiro numa página só */
+.doc-corpo > .bloco:first-of-type { margin-top: 8px; }
+.doc-corpo > .nota:last-child { margin-top: 6px; }
+/* Google Ads: anúncio-base por página e grupos em tabela */
+.pag-ads { margin-top: 12px; }
+.pag-ads h3 .url { font-weight: 400; }
+.anuncio-base { display: grid; grid-template-columns: 1fr 1.2fr; gap: 6px 18px; border: 1px solid var(--linha); border-radius: 10px; padding: 10px 14px; break-inside: avoid; font-size: 9.5pt; }
+.grupos { margin-top: 8px; font-size: 9.5pt; } .grupos td:first-child { width: 22%; font-weight: 600; }
+

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Cérebro Win7 Med</title>
+<!-- start.win7.ai: os sistemas do processo inicial numa tela só (Análise antes do onboarding, Execução depois) e os projetos salvos (ADR-008). Fonte Outfit, SIL Open Font License 1.1 -->
+<style>
+/*{{FONTES}}*/
+:root{
+  --petroleo:#0b4f6c;--petroleo-fundo:#082f44;--petroleo-claro:#1e88b8;--petroleo-leve:#e8f2f7;--tinta:#0e1a22;--texto:#3b5160;--apagado:#6f8593;
+  --fundo:#eef3f6;--cartao:#fff;--linha:#d7e2e8;--linha-forte:#b9cad3;
+  --amarelo:#f5b71a;--vermelho:#e23b3b;--vermelho-escuro:#b42323;--verde:#27a548;--verde-escuro:#1c7a35;--azul:#2f7cc1;
+  --fonte:"Outfit","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --barra:64px;--pulso:30px;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{display:flex;flex-direction:column;background:var(--fundo);color:var(--tinta);font-family:var(--fonte);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amarelo);outline-offset:2px;border-radius:8px}
+
+/* faixa das quatro cores do 7 */
+.faixa{display:flex;height:5px;flex:none}.faixa i{flex:1}
+.faixa i:nth-child(1){background:var(--amarelo)}.faixa i:nth-child(2){background:var(--vermelho)}.faixa i:nth-child(3){background:var(--verde)}.faixa i:nth-child(4){background:var(--azul)}
+
+/* barra fixa com as abas */
+.barra{flex:none;display:flex;align-items:center;gap:20px;min-height:var(--barra);padding:8px max(16px,env(safe-area-inset-left)) 8px max(16px,env(safe-area-inset-right));background:var(--cartao);border-bottom:1px solid var(--linha)}
+.marca{display:flex;align-items:center;gap:12px;text-decoration:none;flex:none}
+.marca img{height:42px;width:auto}
+.marca span{font-size:15px;color:var(--texto);line-height:1.15;border-left:1px solid var(--linha);padding-left:12px}
+.marca b{display:block;color:var(--tinta);font-size:16px}
+.abas{display:flex;gap:6px;margin-left:auto;min-width:0}
+.aba{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:14px;text-decoration:none;border:1.5px solid transparent;color:var(--texto);transition:background .2s,border-color .2s;white-space:nowrap}
+.aba:hover{background:var(--fundo)}
+.aba .n{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--fundo);color:var(--petroleo);font-weight:700;font-size:14px;flex:none}
+.aba .n svg{width:16px;height:16px}
+.aba .t{display:grid;line-height:1.15}
+.aba .t b{font-size:15px;color:var(--tinta)}
+.aba .t small{font-size:12px;color:var(--apagado)}
+.aba[aria-current="page"]{background:var(--petroleo-leve);border-color:var(--petroleo)}
+.aba[aria-current="page"] .n{background:var(--petroleo);color:#fff}
+.aba.inicio{padding:8px 12px}
+
+/* conta de quem está usando */
+.conta{position:relative;flex:none}
+.conta>button{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--linha-forte);background:var(--petroleo-leve);color:var(--petroleo);font-weight:700;font-size:14px;cursor:pointer}
+.conta>button[aria-expanded="true"]{border-color:var(--petroleo)}
+.menu{position:absolute;right:0;top:calc(100% + 8px);z-index:20;width:min(280px,calc(100vw - 32px));background:var(--cartao);border:1px solid var(--linha);border-radius:16px;box-shadow:0 24px 48px -24px rgba(8,47,68,.45);padding:8px}
+.menu .quem{padding:10px 12px 12px;border-bottom:1px solid var(--linha);margin-bottom:6px;display:grid;gap:2px;min-width:0}
+.menu .quem b{font-size:15px}
+.menu .quem span{font-size:13px;color:var(--apagado);overflow-wrap:anywhere}
+.menu a,.menu button{display:flex;width:100%;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:0;background:none;text-decoration:none;font-size:14.5px;text-align:left;cursor:pointer}
+.menu a:hover,.menu button:hover{background:var(--fundo)}
+
+/* batimento contínuo (o mesmo da apresentação do onboarding) */
+.pulso{flex:none;display:flex;align-items:center;gap:10px;height:var(--pulso);padding:0 18px;background:var(--cartao);border-bottom:1px solid var(--linha);overflow:hidden}
+.pulso .bate{width:17px;height:16px;flex:none;fill:var(--vermelho)}
+.pulso .traco{flex:1 1 0;width:0;min-width:0;height:22px}
+.pulso .traco path,.ecg .base,.ecg .luz{fill:none;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.pulso .base{stroke:rgba(30,136,184,.28);stroke-width:1.6}
+.pulso .luz{stroke:var(--petroleo-claro);stroke-width:2.2;stroke-dasharray:70 1000;stroke-dashoffset:70}
+
+/* conteúdo */
+main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.vista{flex:1 1 auto;min-height:0}
+.quadro{display:flex}
+.quadro iframe{flex:1;width:100%;height:100%;border:0;background:var(--fundo)}
+.rola{overflow:auto}
+.envolve{width:min(1080px,100% - 32px);margin-inline:auto;padding-block:40px 48px;display:grid;gap:28px}
+.abre h1{font-size:clamp(1.9rem,4.2vw,3rem);line-height:1.05;letter-spacing:-.015em;text-wrap:balance;max-width:20ch}
+.abre p{margin-top:10px;font-size:clamp(1rem,1.5vw,1.15rem);color:var(--texto);max-width:56ch}
+.abre.menor h1{font-size:clamp(1.6rem,3.2vw,2.3rem)}
+
+/* linha do processo com o batimento grande */
+.linha{position:relative;background:var(--cartao);border:1px solid var(--linha);border-radius:20px;padding:22px 22px 18px;overflow:hidden}
+.ecg{display:flex;align-items:center;gap:6px}
+.ecg .coracao{width:26px;height:24px;flex:none;fill:var(--vermelho)}
+.ecg .linha-ecg{flex:1 1 0;width:0;min-width:0;height:56px}
+.ecg .base{stroke:rgba(11,79,108,.22);stroke-width:2}
+.ecg .luz{stroke:var(--amarelo);stroke-width:3;stroke-dasharray:90 1000;stroke-dashoffset:90}
+.passos{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:6px}
+.passos li{display:grid;gap:2px;padding-left:14px;border-left:3px solid var(--linha-forte)}
+.passos li:nth-child(1){border-color:var(--amarelo)}.passos li:nth-child(2){border-color:var(--verde)}.passos li:nth-child(3){border-color:var(--azul)}
+.passos .q{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--apagado)}
+.passos b{font-size:16px}
+.passos span{font-size:14px;color:var(--texto)}
+
+.cartoes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.cartao{display:grid;gap:12px;align-content:start;background:var(--cartao);border:1px solid var(--linha);border-radius:20px;padding:26px;text-decoration:none;transition:border-color .2s,box-shadow .2s,transform .2s}
+a.cartao:hover{border-color:var(--petroleo);box-shadow:0 18px 40px -26px rgba(8,47,68,.45);transform:translateY(-2px)}
+.cartao .topo-c{display:flex;align-items:center;gap:12px}
+.cartao .n{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--petroleo);color:#fff;font-weight:700;font-size:17px;flex:none}
+.cartao .quando{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--apagado)}
+.cartao h2{font-size:1.45rem;line-height:1.15}
+.cartao p{color:var(--texto)}
+.cartao ul{list-style:none;display:grid;gap:6px}
+.cartao li{display:flex;gap:8px;font-size:14.5px;color:var(--texto)}
+.cartao li::before{content:"";flex:none;width:7px;height:7px;margin-top:8px;border-radius:50%;background:var(--petroleo-claro)}
+.cartao .ir{justify-self:start;display:inline-flex;align-items:center;gap:8px;margin-top:4px;padding:12px 20px;border-radius:12px;background:var(--petroleo);color:#fff;font-weight:700}
+a.cartao:hover .ir{background:var(--petroleo-fundo)}
+.cartao .ir svg{width:18px;height:18px}
+.rodape{font-size:13px;color:var(--apagado)}
+
+/* botões e campos */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:9px 16px;border-radius:12px;border:1.5px solid var(--linha-forte);background:var(--cartao);font-weight:700;font-size:14.5px;text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--petroleo)}
+.btn.primario{background:var(--petroleo);border-color:var(--petroleo);color:#fff}
+.btn.primario:hover{background:var(--petroleo-fundo)}
+.btn.pequeno{min-height:36px;padding:6px 12px;font-size:13.5px;border-radius:10px}
+.btn.perigo{color:var(--vermelho-escuro)}
+.btn[disabled]{opacity:.5;cursor:default}
+.campo{display:grid;gap:6px;min-width:0}
+.campo label{font-size:13.5px;font-weight:700;color:var(--texto)}
+.campo input,.campo select{width:100%;min-height:46px;padding:10px 14px;border:1.5px solid var(--linha-forte);border-radius:12px;background:var(--cartao);font-size:15px}
+.campo input:focus,.campo select:focus{outline:none;border-color:var(--petroleo);box-shadow:0 0 0 3px rgba(30,136,184,.18)}
+.campo input[readonly]{background:var(--fundo);color:var(--texto)}
+.ajuda{font-size:13px;color:var(--apagado)}
+.aviso{font-size:14px;padding:10px 14px;border-radius:12px;background:var(--fundo);color:var(--texto)}
+.aviso.erro{background:#fdecec;color:var(--vermelho-escuro)}
+.aviso.ok{background:#e9f6ec;color:var(--verde-escuro)}
+
+/* portão: entrar e convite, por cima de tudo */
+.portao{position:fixed;inset:0;z-index:50;display:grid;place-items:center;overflow:auto;padding:max(24px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));background:var(--fundo)}
+.portao::before{content:"";position:fixed;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,var(--amarelo) 0 25%,var(--vermelho) 25% 50%,var(--verde) 50% 75%,var(--azul) 75%)}
+.porta{width:min(420px,100%);display:grid;gap:18px;background:var(--cartao);border:1px solid var(--linha);border-radius:24px;padding:32px 28px;box-shadow:0 30px 60px -40px rgba(8,47,68,.5)}
+.porta img{height:46px;width:auto;justify-self:start}
+.porta h1{font-size:1.6rem;line-height:1.1;text-wrap:balance}
+.porta p{color:var(--texto)}
+.porta form{display:grid;gap:14px}
+.porta .btn{width:100%;min-height:48px;font-size:15.5px}
+.porta .ecg{margin-block:-4px}
+
+/* projetos */
+.ferramentas{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.ferramentas .campo{flex:1 1 240px}
+.ferramentas .campo.etapas{flex:0 1 220px}
+.marcar{display:flex;align-items:center;gap:8px;min-height:46px;font-size:14px;color:var(--texto);cursor:pointer}
+.marcar input{width:18px;height:18px;accent-color:var(--petroleo)}
+.projetos{display:grid;gap:12px}
+.projeto{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) auto;gap:18px;align-items:center;background:var(--cartao);border:1px solid var(--linha);border-radius:18px;padding:18px 20px}
+.projeto.arquivado{opacity:.7;border-style:dashed}
+.projeto .nome{display:grid;gap:2px;min-width:0}
+.projeto .nome b{font-size:16.5px;line-height:1.2;overflow-wrap:anywhere}
+.projeto .nome span,.projeto .quando-p{font-size:13.5px;color:var(--apagado)}
+.projeto .quando-p b{display:block;font-size:14px;color:var(--texto);font-weight:400}
+.etapa{display:grid;gap:6px}
+.etapa .pontos{display:flex;gap:5px}
+.etapa .pontos i{width:22px;height:6px;border-radius:3px;background:var(--linha)}
+.etapa[data-e="diagnostico"] .pontos i:nth-child(-n+1),.etapa[data-e="onboarding"] .pontos i:nth-child(-n+2),.etapa[data-e="mapeamento"] .pontos i{background:var(--petroleo-claro)}
+.etapa[data-e="mapeamento"] .pontos i{background:var(--verde)}
+.etapa span{font-size:13.5px;font-weight:700;color:var(--texto)}
+.projeto .acoes-p{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.detalhe{grid-column:1/-1;border-top:1px solid var(--linha);padding-top:14px;display:grid;gap:10px}
+.detalhe ol{list-style:none;display:grid;gap:6px;max-height:260px;overflow:auto}
+.detalhe li{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:14px;color:var(--texto)}
+.detalhe li time{color:var(--apagado);font-variant-numeric:tabular-nums;min-width:132px}
+.vazio{text-align:center;padding:40px 20px;border:1.5px dashed var(--linha-forte);border-radius:18px;color:var(--texto);display:grid;gap:12px;justify-items:center}
+
+/* equipe */
+.grade-equipe{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:18px;align-items:start}
+.cartao form{display:grid;gap:14px}
+.link-convite{display:grid;gap:10px}
+.link-convite code{display:block;padding:12px 14px;border-radius:12px;background:var(--fundo);font-size:13px;overflow-wrap:anywhere;user-select:all}
+.pessoas{display:grid;gap:0}
+.pessoa{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--linha)}
+.pessoa:last-child{border-bottom:0}
+.pessoa .nome{display:grid;gap:1px;min-width:0}
+.pessoa .nome b{overflow-wrap:anywhere}
+.pessoa .nome span{font-size:13px;color:var(--apagado);overflow-wrap:anywhere}
+.selo{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;background:var(--petroleo-leve);color:var(--petroleo);margin-left:6px;vertical-align:1px}
+.selo.off{background:#fdecec;color:var(--vermelho-escuro)}
+.selo.pend{background:#fff4d6;color:#7a5600}
+.cartao h3{font-size:1.1rem}
+
+@media (prefers-reduced-motion:no-preference){
+  .pulso .bate,.ecg .coracao{transform-box:fill-box;transform-origin:center;animation:bate 1.2s ease-in-out infinite}
+  .pulso .luz{animation:monitor 3.2s linear infinite;filter:drop-shadow(0 0 3px rgba(30,136,184,.7))}
+  .ecg .luz{animation:monitor 2.6s linear infinite;filter:drop-shadow(0 0 4px rgba(245,183,26,.8))}
+  @keyframes bate{0%,100%{transform:scale(1)}12%{transform:scale(1.28)}24%{transform:scale(1)}36%{transform:scale(1.16)}52%{transform:scale(1)}}
+  @keyframes monitor{from{stroke-dashoffset:70}to{stroke-dashoffset:-1000}}
+  .vista.entra,.porta{animation:entra .35s ease-out both}
+  @keyframes entra{from{opacity:0;transform:translateY(6px)}}
+}
+@media (prefers-reduced-motion:reduce){.pulso .luz,.ecg .luz{display:none}}
+
+@media (max-width:980px){
+  .projeto{grid-template-columns:minmax(0,1fr) auto;gap:12px 16px}
+  .projeto .acoes-p{grid-column:1/-1;justify-content:flex-start}
+  .grade-equipe{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  .marca span{display:none}
+  .aba .t small{display:none}
+  .cartoes{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  :root{--barra:auto}
+  .barra{flex-wrap:wrap;gap:8px;padding-block:8px}
+  .marca img{height:34px}
+  .conta{margin-left:auto}
+  .abas{order:3;margin-left:0;width:100%;gap:4px}
+  .aba{flex:1 1 0;min-width:0;justify-content:center;padding:6px 4px;gap:5px}
+  .aba .n{width:22px;height:22px;font-size:12px}
+  .aba .n svg{width:13px;height:13px}
+  .aba .t b{font-size:13.5px}
+  .aba.inicio{flex:0 0 auto;padding:6px 10px}
+  .passos{grid-template-columns:1fr}
+  .envolve{padding-block:24px 32px;gap:20px}
+  .cartao{padding:20px}
+  .projeto{grid-template-columns:1fr;padding:16px}
+  .porta{padding:26px 20px}
+}
+@media (max-width:380px){
+  .aba .n{display:none}
+}
+</style>
+</head>
+<body>
+<div class="faixa" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<header class="barra">
+  <a class="marca" href="#inicio" aria-label="Cérebro Win7 Med, início"><img src="{{LOGO}}" alt="Win7 Med"><span><b>Cérebro</b>processo inicial</span></a>
+  <nav class="abas" aria-label="Sistemas" id="abas" hidden>
+    <a class="aba inicio" href="#inicio" data-aba="inicio"><span class="t"><b>Início</b></span></a>
+    <a class="aba" href="#analise" data-aba="analise"><span class="n">1</span><span class="t"><b>Análise</b><small>antes do onboarding</small></span></a>
+    <a class="aba" href="#execucao" data-aba="execucao"><span class="n">2</span><span class="t"><b>Execução</b><small>depois do onboarding</small></span></a>
+    <a class="aba" href="#projetos" data-aba="projetos"><span class="n"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4.2l2 2.2h8.8A1.5 1.5 0 0 1 21 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><span class="t"><b>Projetos</b><small>salvos no sistema</small></span></a>
+  </nav>
+  <div class="conta" id="conta" hidden>
+    <button type="button" id="conta-botao" aria-expanded="false" aria-haspopup="true" aria-controls="conta-menu" aria-label="Sua conta"></button>
+    <div class="menu" id="conta-menu" hidden>
+      <div class="quem"><b id="conta-nome"></b><span id="conta-email"></span></div>
+      <a href="#equipe" id="menu-equipe" hidden>Equipe e convites</a>
+      <button type="button" id="sair">Sair</button>
+    </div>
+  </div>
+</header>
+<div class="pulso" aria-hidden="true">{{PULSO}}</div>
+
+<main>
+  <section class="vista rola" id="v-inicio" aria-labelledby="t-inicio" hidden>
+    <div class="envolve">
+      <div class="abre">
+        <h1 id="t-inicio">Do primeiro contato à página no ar</h1>
+        <p>Os sistemas do processo inicial da Win7 Med num lugar só. Escolha o momento do cliente. Cada diagnóstico e cada onboarding ficam salvos em Projetos.</p>
+      </div>
+
+      <div class="linha" aria-label="Linha do processo">
+        <div class="ecg" aria-hidden="true">{{ECG}}</div>
+        <ol class="passos">
+          <li><span class="q">Antes</span><b>Análise de Google Ads</b><span>Diagnóstico e modelo da página</span></li>
+          <li><span class="q">Na reunião</span><b>Apresentação do onboarding</b><span>As decisões e o mapeamento</span></li>
+          <li><span class="q">Depois</span><b>Execução do projeto</b><span>Copy, roteiro, Google Ads e páginas</span></li>
+        </ol>
+      </div>
+
+      <div class="cartoes">
+        <a class="cartao" href="#analise" data-novo="1">
+          <div class="topo-c"><span class="n">1</span><span class="quando">Antes do onboarding</span></div>
+          <h2>Análise</h2>
+          <p>O diagnóstico de Google Ads do cliente e, na reunião, a apresentação do onboarding com o mapeamento.</p>
+          <ul><li>Copiar a mensagem de ativação do agente</li><li>Gerar o diagnóstico: ele fica salvo em Projetos</li><li>Apresentar no onboarding: cada resposta fica salva</li></ul>
+          <span class="ir">Abrir a análise <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a class="cartao" href="#execucao">
+          <div class="topo-c"><span class="n">2</span><span class="quando">Depois do onboarding</span></div>
+          <h2>Execução</h2>
+          <p>O robô 3 lê a pasta do cliente e entrega a ficha, a copy, o roteiro, o Google Ads e as páginas no ar.</p>
+          <ul><li>Baixar o diagnóstico e o mapeamento em Projetos</li><li>Copiar o comando inicial do robô 3</li><li>Passar o endereço da pasta do cliente</li></ul>
+          <span class="ir">Abrir a execução <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+      </div>
+      <p class="rodape">Cérebro Win7 Med · uso interno · acesso por convite</p>
+    </div>
+  </section>
+  <section class="vista quadro" id="v-analise" hidden><iframe data-src="analise.html" title="Análise · antes do onboarding" allow="clipboard-write; fullscreen"></iframe></section>
+  <section class="vista quadro" id="v-execucao" hidden><iframe data-src="robo3.html" title="Execução · depois do onboarding" allow="clipboard-write; fullscreen"></iframe></section>
+
+  <section class="vista rola" id="v-projetos" aria-labelledby="t-projetos" hidden>
+    <div class="envolve">
+      <div class="abre menor">
+        <h1 id="t-projetos">Projetos salvos</h1>
+        <p>Cada diagnóstico gerado na Análise, as respostas do onboarding e o mapeamento. Abra para rever ou continuar, ou baixe os dados para a pasta do robô 3.</p>
+      </div>
+      <div class="ferramentas">
+        <div class="campo"><label for="busca">Buscar cliente ou cidade</label><input id="busca" type="search" autocomplete="off" placeholder="ex.: Vértice, Goiânia"></div>
+        <div class="campo etapas"><label for="filtro-etapa">Etapa</label>
+          <select id="filtro-etapa"><option value="">Todas</option><option value="diagnostico">Só diagnóstico</option><option value="onboarding">Onboarding em andamento</option><option value="mapeamento">Mapeamento pronto</option></select></div>
+        <label class="marcar" id="ver-arquivados-l" hidden><input type="checkbox" id="ver-arquivados"> Mostrar arquivados</label>
+        <a class="btn primario" href="#analise" data-novo="1">Novo projeto</a>
+      </div>
+      <p class="aviso" id="msg-projetos" role="status" hidden></p>
+      <div class="projetos" id="lista-projetos" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="vista rola" id="v-equipe" aria-labelledby="t-equipe" hidden>
+    <div class="envolve">
+      <div class="abre menor">
+        <h1 id="t-equipe">Equipe</h1>
+        <p>Quem acessa o Cérebro. Cada pessoa entra com a própria conta, criada por um convite.</p>
+      </div>
+      <div class="grade-equipe">
+        <div class="cartao">
+          <h3>Convidar pessoa</h3>
+          <form id="form-convite" novalidate>
+            <div class="campo"><label for="cv-nome">Nome</label><input id="cv-nome" required maxlength="80" autocomplete="off"></div>
+            <div class="campo"><label for="cv-email">E-mail</label><input id="cv-email" type="email" required maxlength="160" autocomplete="off"></div>
+            <div class="campo"><label for="cv-papel">Acesso</label><select id="cv-papel"><option value="equipe">Equipe: projetos e sistemas</option><option value="admin">Administrador: também equipe e arquivar</option></select></div>
+            <button class="btn primario" type="submit">Gerar link de convite</button>
+          </form>
+          <p class="aviso" id="msg-convite" role="status" hidden></p>
+          <div class="link-convite" id="link-convite" hidden>
+            <p class="ajuda">Envie este link à pessoa pelo WhatsApp ou e-mail. Ele vale 7 dias e funciona uma vez: ela mesma cria a senha.</p>
+            <code id="link-convite-texto"></code>
+            <button class="btn" type="button" id="copiar-convite">Copiar link</button>
+          </div>
+        </div>
+        <div class="cartao">
+          <h3>Pessoas</h3>
+          <div class="pessoas" id="lista-pessoas"></div>
+          <h3 id="t-pendentes" hidden>Convites pendentes</h3>
+          <div class="pessoas" id="lista-convites"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="portao" id="portao">
+  <div class="porta" id="porta-carregando">
+    <img class="logo-porta" alt="Win7 Med">
+    <div class="ecg" aria-hidden="true">{{ECG}}</div>
+    <p id="msg-carregando" role="status">Conferindo o acesso...</p>
+    <button class="btn" type="button" id="tentar" hidden>Tentar de novo</button>
+  </div>
+  <div class="porta" id="porta-entrar" hidden>
+    <img class="logo-porta" alt="Win7 Med">
+    <div><h1>Entrar no Cérebro</h1><p>Os projetos dos clientes ficam salvos aqui, para toda a equipe.</p></div>
+    <form id="form-entrar" novalidate>
+      <div class="campo"><label for="en-email">E-mail</label><input id="en-email" type="email" autocomplete="username" required maxlength="160"></div>
+      <div class="campo"><label for="en-senha">Senha</label><input id="en-senha" type="password" autocomplete="current-password" required maxlength="200"></div>
+      <p class="aviso erro" id="msg-entrar" role="alert" hidden></p>
+      <button class="btn primario" type="submit">Entrar</button>
+    </form>
+    <p class="ajuda">Acesso por convite. Peça o seu a quem administra o Cérebro.</p>
+  </div>
+  <div class="porta" id="porta-convite" hidden>
+    <img class="logo-porta" alt="Win7 Med">
+    <div><h1>Criar seu acesso</h1><p>Você recebeu um convite para o Cérebro Win7 Med. Confira seus dados e crie a sua senha.</p></div>
+    <form id="form-aceitar" novalidate>
+      <div class="campo"><label for="ac-email">E-mail</label><input id="ac-email" type="email" autocomplete="username" readonly></div>
+      <div class="campo"><label for="ac-nome">Seu nome</label><input id="ac-nome" autocomplete="name" required maxlength="80"></div>
+      <div class="campo"><label for="ac-senha">Senha</label><input id="ac-senha" type="password" autocomplete="new-password" required minlength="10" maxlength="200" aria-describedby="ac-ajuda"><span class="ajuda" id="ac-ajuda">Pelo menos 10 caracteres. Uma frase curta é mais fácil de lembrar.</span></div>
+      <div class="campo"><label for="ac-senha2">Repita a senha</label><input id="ac-senha2" type="password" autocomplete="new-password" required maxlength="200"></div>
+      <p class="aviso erro" id="msg-aceitar" role="alert" hidden></p>
+      <button class="btn primario" type="submit">Criar acesso e entrar</button>
+    </form>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var TITULOS = { inicio: 'Cérebro Win7 Med', analise: 'Análise · Cérebro Win7 Med', execucao: 'Execução · Cérebro Win7 Med', projetos: 'Projetos · Cérebro Win7 Med', equipe: 'Equipe · Cérebro Win7 Med' };
+  var ETAPAS = { diagnostico: 'Diagnóstico gerado', onboarding: 'Onboarding em andamento', mapeamento: 'Mapeamento pronto' };
+  var eu = null, projetos = [], listaVelha = true;
+
+  // ---------------------------------------------------------------- servidor (ADR-008)
+  function api(metodo, rota, corpo) {
+    var cab = { 'X-Start': '1' }; if (corpo) cab['Content-Type'] = 'application/json';
+    return fetch('/api/' + rota, { method: metodo, credentials: 'same-origin', headers: cab, body: corpo ? JSON.stringify(corpo) : undefined }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (r.ok) return j;
+        if (r.status === 401 && eu && rota !== 'entrar') sessaoVencida();
+        var e = new Error((j.erro && j.erro.mensagem) || 'O sistema não respondeu.'); e.status = r.status; throw e;
+      });
+    }, function () { throw new Error('Sem conexão com o sistema.'); });
+  }
+  function aviso(id, texto, tipo) { var el = $(id); el.hidden = !texto; el.textContent = texto || ''; el.className = 'aviso' + (tipo ? ' ' + tipo : ''); }
+  function esc(t) { return String(t === null || t === undefined ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function quando(iso) {
+    if (!iso) return '';
+    var d = new Date(iso); if (isNaN(d)) return '';
+    return d.toLocaleDateString('pt-BR') + ' às ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+  function iniciais(nome) { var p = String(nome || '?').trim().split(/\s+/); return ((p[0] || '?')[0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase(); }
+  function baixar(nome, objeto) {
+    var url = URL.createObjectURL(new Blob([JSON.stringify(objeto, null, 2)], { type: 'application/json' }));
+    var a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1500);
+  }
+
+  // ---------------------------------------------------------------- portão: entrar, convite, sessão
+  function porta(qual) {
+    $('portao').hidden = !qual;
+    ['carregando', 'entrar', 'convite'].forEach(function (k) { $('porta-' + k).hidden = k !== qual; });
+    var campo = qual === 'entrar' ? $('en-email').value ? $('en-senha') : $('en-email') : qual === 'convite' ? $('ac-nome') : null;
+    if (campo) setTimeout(function () { campo.focus(); }, 60);
+  }
+  function entrou(u) {
+    eu = u;
+    $('conta-botao').textContent = iniciais(u.nome);
+    $('conta-nome').textContent = u.nome; $('conta-email').textContent = u.email + (u.papel === 'admin' ? ' · administrador' : '');
+    $('menu-equipe').hidden = u.papel !== 'admin'; $('ver-arquivados-l').hidden = u.papel !== 'admin';
+    $('abas').hidden = false; $('conta').hidden = false;
+    porta(null); listaVelha = true; mostrar();
+  }
+  function sessaoVencida() {
+    // por cima do que está aberto: os sistemas continuam carregados e a fila de gravação tenta de novo depois de entrar
+    if (!$('portao').hidden) return;
+    aviso('msg-entrar', 'Sua sessão terminou. Entre de novo para continuar salvando.', 'erro');
+    porta('entrar');
+  }
+  function conferir() {
+    porta('carregando'); $('tentar').hidden = true; $('msg-carregando').textContent = 'Conferindo o acesso...';
+    var conv = /^#convite=([a-f0-9]{40})$/.exec(location.hash);
+    if (conv) { abrirConvite(conv[1]); return; }
+    api('GET', 'sessao').then(function (r) { if (r.usuario) entrou(r.usuario); else porta('entrar'); }, function (e) {
+      $('msg-carregando').textContent = e.message + ' Tente de novo em instantes.'; $('tentar').hidden = false;
+    });
+  }
+  $('tentar').addEventListener('click', conferir);
+  $('form-entrar').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = $('en-email').value.trim(), senha = $('en-senha').value, b = e.target.querySelector('button');
+    if (!email || !senha) { aviso('msg-entrar', 'Preencha o e-mail e a senha.', 'erro'); return; }
+    b.disabled = true; aviso('msg-entrar', '');
+    api('POST', 'entrar', { email: email, senha: senha }).then(function (u) { $('en-senha').value = ''; b.disabled = false; entrou(u); },
+      function (er) { b.disabled = false; aviso('msg-entrar', er.message, 'erro'); $('en-senha').select(); });
+  });
+  var tokenConvite = '';
+  function abrirConvite(token) {
+    tokenConvite = token;
+    api('POST', 'convite/ver', { token: token }).then(function (c) {
+      // convite sem e-mail (o do primeiro administrador): a pessoa escreve o dela
+      $('ac-email').value = c.email || ''; $('ac-email').readOnly = !!c.email; $('ac-email').required = !c.email;
+      $('ac-nome').value = c.nome || ''; aviso('msg-aceitar', ''); porta('convite');
+      if (!c.email) setTimeout(function () { $('ac-email').focus(); }, 80);
+    }, function (er) {
+      try { history.replaceState(null, '', location.pathname); } catch (x) { /* fica */ }
+      aviso('msg-entrar', er.message, 'erro'); porta('entrar');
+    });
+  }
+  $('form-aceitar').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var s1 = $('ac-senha').value, s2 = $('ac-senha2').value, nome = $('ac-nome').value.trim(), email = $('ac-email').value.trim(), b = e.target.querySelector('button');
+    if (!$('ac-email').readOnly && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { aviso('msg-aceitar', 'Escreva o seu e-mail.', 'erro'); return; }
+    if (!nome) { aviso('msg-aceitar', 'Escreva o seu nome.', 'erro'); return; }
+    if (s1.length < 10) { aviso('msg-aceitar', 'A senha precisa ter pelo menos 10 caracteres.', 'erro'); return; }
+    if (s1 !== s2) { aviso('msg-aceitar', 'As duas senhas não são iguais.', 'erro'); return; }
+    b.disabled = true;
+    api('POST', 'convite/aceitar', { token: tokenConvite, nome: nome, senha: s1, email: email }).then(function (u) {
+      $('ac-senha').value = $('ac-senha2').value = ''; tokenConvite = '';
+      try { history.replaceState(null, '', location.pathname + '#inicio'); } catch (x) { location.hash = 'inicio'; }
+      b.disabled = false; entrou(u);
+    }, function (er) { b.disabled = false; aviso('msg-aceitar', er.message, 'erro'); });
+  });
+
+  // conta
+  function menu(abrir) { $('conta-menu').hidden = !abrir; $('conta-botao').setAttribute('aria-expanded', String(!!abrir)); }
+  $('conta-botao').addEventListener('click', function (e) { e.stopPropagation(); menu($('conta-menu').hidden); });
+  document.addEventListener('click', function (e) { if (!$('conta').contains(e.target)) menu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') menu(false); });
+  $('menu-equipe').addEventListener('click', function () { menu(false); });
+  $('sair').addEventListener('click', function () {
+    menu(false);
+    api('POST', 'sair').catch(function () { /* sai do mesmo jeito */ }).then(function () {
+      eu = null; projetos = [];
+      // quem entrar depois começa limpo: os sistemas abertos são descarregados
+      document.querySelectorAll('iframe[data-src]').forEach(function (f) { f.removeAttribute('src'); });
+      $('abas').hidden = true; $('conta').hidden = true; $('lista-projetos').innerHTML = '';
+      try { history.replaceState(null, '', location.pathname + '#inicio'); } catch (x) { /* fica */ }
+      aviso('msg-entrar', ''); porta('entrar');
+    });
+  });
+
+  // os sistemas avisam: sessão vencida e projeto salvo
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data) return;
+    if (e.data.tipo === 'w7-sessao') sessaoVencida();
+    if (e.data.tipo === 'w7-projeto') listaVelha = true;
+  });
+
+  // ---------------------------------------------------------------- navegação
+  function abrirAnalise(src) {
+    var f = document.querySelector('#v-analise iframe');
+    if (f.getAttribute('src') !== src) f.setAttribute('src', src);
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('[data-novo]');
+    if (a) abrirAnalise('analise.html?novo=1');
+  });
+  function mostrar() {
+    if (!eu) return;
+    var aba = (location.hash || '#inicio').slice(1);
+    if (!TITULOS[aba] || (aba === 'equipe' && eu.papel !== 'admin')) aba = 'inicio';
+    Object.keys(TITULOS).forEach(function (k) {
+      var v = $('v-' + k), ativo = k === aba;
+      if (ativo && v.hidden) { v.hidden = false; v.classList.remove('entra'); void v.offsetWidth; v.classList.add('entra'); } else v.hidden = !ativo;
+      var f = v.querySelector('iframe[data-src]');
+      if (ativo && f && !f.getAttribute('src')) f.setAttribute('src', f.getAttribute('data-src'));
+    });
+    document.querySelectorAll('[data-aba]').forEach(function (a) { if (a.getAttribute('data-aba') === aba) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    document.title = TITULOS[aba];
+    if (aba === 'projetos' && listaVelha) carregarProjetos();
+    if (aba === 'equipe') carregarEquipe();
+  }
+  window.addEventListener('hashchange', function () {
+    if (/^#convite=/.test(location.hash)) { conferir(); return; }
+    mostrar();
+  });
+
+  // ---------------------------------------------------------------- projetos
+  function carregarProjetos() {
+    listaVelha = false;
+    if (!projetos.length) aviso('msg-projetos', 'Carregando os projetos...', '');
+    api('GET', 'projetos' + ($('ver-arquivados').checked ? '?arquivados=1' : '')).then(function (r) {
+      projetos = r.projetos || []; aviso('msg-projetos', ''); desenharProjetos();
+    }, function (e) { listaVelha = true; aviso('msg-projetos', 'Não consegui carregar os projetos: ' + e.message, 'erro'); });
+  }
+  function semAcento(t) { return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function desenharProjetos() {
+    var busca = semAcento($('busca').value.trim()), etapa = $('filtro-etapa').value;
+    var lista = projetos.filter(function (p) {
+      return (!etapa || p.etapa === etapa) && (!busca || semAcento(p.nome + ' ' + p.cidade + ' ' + p.uf).indexOf(busca) >= 0);
+    });
+    var alvo = $('lista-projetos');
+    if (!projetos.length) {
+      alvo.innerHTML = '<div class="vazio"><b>Nenhum projeto salvo ainda.</b><span>Gere um diagnóstico na Análise: ele aparece aqui na hora, com o onboarding e o mapeamento.</span><a class="btn primario" href="#analise" data-novo="1">Abrir a análise</a></div>';
+      return;
+    }
+    if (!lista.length) { alvo.innerHTML = '<div class="vazio"><b>Nenhum projeto com esse filtro.</b></div>'; return; }
+    alvo.innerHTML = lista.map(function (p) {
+      var local = [p.cidade, p.uf].filter(Boolean).join('/');
+      return '<article class="projeto' + (p.arquivado ? ' arquivado' : '') + '" data-id="' + esc(p.id) + '">' +
+        '<div class="nome"><b>' + esc(p.nome) + '</b><span>' + esc(local || 'cidade não informada') + (p.setor === 'geral' ? ' · fora da saúde' : '') + (p.arquivado ? ' · arquivado' : '') + '</span></div>' +
+        '<div class="etapa" data-e="' + esc(p.etapa) + '"><div class="pontos" aria-hidden="true"><i></i><i></i><i></i></div><span>' + esc(ETAPAS[p.etapa] || p.etapa) + '</span></div>' +
+        '<div class="quando-p">Atualizado por ' + esc(p.atualizado_por) + '<b>' + esc(quando(p.atualizado_em)) + '</b></div>' +
+        '<div class="acoes-p">' +
+          (p.arquivado ? '' : '<button class="btn pequeno primario" type="button" data-acao="abrir">Abrir</button>') +
+          '<button class="btn pequeno" type="button" data-acao="diagnostico">Diagnóstico (JSON)</button>' +
+          (p.etapa === 'mapeamento' ? '<button class="btn pequeno" type="button" data-acao="mapa">Mapeamento (JSON)</button>' : '') +
+          '<button class="btn pequeno" type="button" data-acao="historico" aria-expanded="false">Histórico</button>' +
+          (eu && eu.papel === 'admin' ? '<button class="btn pequeno perigo" type="button" data-acao="arquivar">' + (p.arquivado ? 'Desarquivar' : 'Arquivar') + '</button>' : '') +
+        '</div></article>';
+    }).join('');
+  }
+  $('busca').addEventListener('input', desenharProjetos);
+  $('filtro-etapa').addEventListener('change', desenharProjetos);
+  $('ver-arquivados').addEventListener('change', carregarProjetos);
+  var cacheProjeto = {};
+  function projetoCompleto(id) {
+    var resumo = projetos.filter(function (p) { return p.id === id; })[0];
+    var c = cacheProjeto[id];
+    if (c && resumo && c.atualizado_em === resumo.atualizado_em) return Promise.resolve(c);
+    return api('GET', 'projetos/' + id).then(function (p) { cacheProjeto[id] = p; return p; });
+  }
+  $('lista-projetos').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-acao]'); if (!b) return;
+    var art = b.closest('.projeto'), id = art.getAttribute('data-id'), acao = b.getAttribute('data-acao');
+    var resumo = projetos.filter(function (p) { return p.id === id; })[0] || {};
+    if (acao === 'abrir') { abrirAnalise('analise.html?projeto=' + id); location.hash = 'analise'; return; }
+    if (acao === 'arquivar') {
+      if (b.getAttribute('data-confirmar') !== '1') { b.setAttribute('data-confirmar', '1'); b.textContent = 'Confirmar'; setTimeout(function () { if (b.isConnected) { b.removeAttribute('data-confirmar'); b.textContent = resumo.arquivado ? 'Desarquivar' : 'Arquivar'; } }, 4000); return; }
+      b.disabled = true;
+      api('POST', 'projetos/' + id + '/arquivar', { arquivar: !resumo.arquivado }).then(carregarProjetos, function (er) { b.disabled = false; aviso('msg-projetos', er.message, 'erro'); });
+      return;
+    }
+    if (acao === 'historico') {
+      var aberto = art.querySelector('.detalhe');
+      if (aberto) { aberto.remove(); b.setAttribute('aria-expanded', 'false'); return; }
+      b.setAttribute('aria-expanded', 'true');
+    }
+    b.disabled = true;
+    projetoCompleto(id).then(function (p) {
+      b.disabled = false;
+      var slug = p.slug || 'cliente';
+      if (acao === 'diagnostico') baixar('diagnostico-' + slug + '.json', p.diagnostico);
+      if (acao === 'mapa' && p.mapa) baixar('mapa-onboarding-' + slug + '.json', p.mapa.dados);
+      if (acao === 'historico') {
+        var d = document.createElement('div'); d.className = 'detalhe';
+        var versoes = (p.versoes || []).length + (p.versoes_onboarding || []).length;
+        d.innerHTML = '<span class="ajuda">Criado por ' + esc(p.criado_por) + ' em ' + esc(quando(p.criado_em)) + (versoes ? ' · ' + versoes + ' versão(ões) anterior(es) guardada(s)' : '') + '</span>' +
+          '<ol>' + (p.historico || []).slice(0, 40).map(function (h) { return '<li><time datetime="' + esc(h.quando) + '">' + esc(quando(h.quando)) + '</time><span>' + esc(h.acao) + ' · ' + esc(h.quem) + '</span></li>'; }).join('') + '</ol>';
+        art.appendChild(d);
+      }
+    }, function (er) { b.disabled = false; aviso('msg-projetos', er.message, 'erro'); });
+  });
+
+  // ---------------------------------------------------------------- equipe (administrador)
+  function carregarEquipe() {
+    api('GET', 'equipe').then(function (r) {
+      $('lista-pessoas').innerHTML = (r.usuarios || []).map(function (u) {
+        var euMesmo = eu && u.email === eu.email;
+        return '<div class="pessoa"><div class="nome"><b>' + esc(u.nome) + (u.papel === 'admin' ? '<span class="selo">administrador</span>' : '') + (u.ativo ? '' : '<span class="selo off">desativada</span>') + '</b>' +
+          '<span>' + esc(u.email) + (u.ultimoAcesso ? ' · último acesso ' + esc(quando(u.ultimoAcesso)) : ' · ainda não entrou') + '</span></div>' +
+          (euMesmo ? '<span class="ajuda">você</span>' : '<button class="btn pequeno' + (u.ativo ? ' perigo' : '') + '" type="button" data-email="' + esc(u.email) + '" data-ativo="' + (u.ativo ? '0' : '1') + '">' + (u.ativo ? 'Desativar' : 'Reativar') + '</button>') + '</div>';
+      }).join('');
+      var pend = r.convites || [];
+      $('t-pendentes').hidden = !pend.length;
+      $('lista-convites').innerHTML = pend.map(function (c) {
+        return '<div class="pessoa"><div class="nome"><b>' + esc(c.nome) + '<span class="selo pend">convite</span></b><span>' + esc(c.email || 'e-mail a definir por quem aceitar') + ' · vence em ' + esc(quando(new Date(c.expira).toISOString())) + '</span></div>' +
+          '<button class="btn pequeno" type="button" data-cancelar="' + esc(c.email) + '"' + (c.email ? '' : ' hidden') + '>Cancelar</button></div>';
+      }).join('');
+    }, function (e) { $('lista-pessoas').innerHTML = '<p class="aviso erro">' + esc(e.message) + '</p>'; });
+  }
+  $('lista-pessoas').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-email]'); if (!b) return;
+    b.disabled = true;
+    api('POST', 'equipe/situacao', { email: b.getAttribute('data-email'), ativo: b.getAttribute('data-ativo') === '1' }).then(carregarEquipe, function (er) { b.disabled = false; alertaEquipe(er.message); });
+  });
+  $('lista-convites').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-cancelar]'); if (!b) return;
+    b.disabled = true;
+    api('POST', 'equipe/convites/cancelar', { email: b.getAttribute('data-cancelar') }).then(carregarEquipe, function (er) { b.disabled = false; alertaEquipe(er.message); });
+  });
+  function alertaEquipe(t) { aviso('msg-convite', t, 'erro'); }
+  $('form-convite').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nome = $('cv-nome').value.trim(), email = $('cv-email').value.trim(), b = e.target.querySelector('button');
+    if (!nome || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { aviso('msg-convite', 'Preencha o nome e um e-mail válido.', 'erro'); return; }
+    b.disabled = true; aviso('msg-convite', ''); $('link-convite').hidden = true;
+    api('POST', 'equipe/convites', { nome: nome, email: email, papel: $('cv-papel').value }).then(function (r) {
+      b.disabled = false; $('cv-nome').value = ''; $('cv-email').value = '';
+      $('link-convite-texto').textContent = r.link; $('link-convite').hidden = false;
+      aviso('msg-convite', 'Convite criado para ' + email + '.', 'ok'); carregarEquipe();
+    }, function (er) { b.disabled = false; aviso('msg-convite', er.message, 'erro'); });
+  });
+  $('copiar-convite').addEventListener('click', function () {
+    var t = $('link-convite-texto').textContent, b = this;
+    var ok = function () { b.textContent = 'Link copiado'; setTimeout(function () { b.textContent = 'Copiar link'; }, 2500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { window.getSelection().selectAllChildren($('link-convite-texto')); });
+    else window.getSelection().selectAllChildren($('link-convite-texto'));
+  });
+
+  // a logo das telas de entrada é a mesma da barra (uma cópia só no arquivo)
+  document.querySelectorAll('.logo-porta').forEach(function (i) { i.src = document.querySelector('.marca img').src; });
+  conferir();
+})();
+</script>
+</body>
+</html>

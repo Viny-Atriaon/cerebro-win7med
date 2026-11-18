@@ -1,0 +1,224 @@
+{
+  "schema": "w7-ficha",
+  "versao": 1,
+  "cliente": {
+    "nome": "Clínica Vértice Imagem",
+    "slug": "clinica-vertice-imagem",
+    "setor": "saude",
+    "cidade": "Rio Verde",
+    "uf": "GO",
+    "data_reuniao": "21/10/2026"
+  },
+  "paginas": [
+    {
+      "servico": "Ressonância magnética",
+      "slug": "",
+      "principal": true
+    },
+    {
+      "servico": "Tomografia",
+      "slug": "tomografia",
+      "principal": false
+    }
+  ],
+  "fatos": {
+    "nome_publico": {
+      "valor": "Clínica Vértice Imagem",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "endereco": {
+      "valor": "Setor Central, Rio Verde/GO (exemplo)",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "telefone": {
+      "valor": "(64) 0000-0000",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "whatsapp": {
+      "valor": "(64) 99999-0000",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "horario": {
+      "valor": "Seg. a sex. 7h às 19h · sáb. 7h às 12h",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "site": {
+      "valor": "https://verticeimagem.exemplo.com.br",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "rt": {
+      "valor": "Dra. Helena Prado · CRM/GO 00000",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "razao_social": {
+      "valor": "Vértice Diagnóstico por Imagem Ltda (fictícia)",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "cnpj": {
+      "valor": "00.000.000/0001-91",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "email_privacidade": {
+      "valor": "privacidade@verticeimagem.exemplo.com.br",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    "selo": {
+      "valor": "12 anos de referência em Rio Verde",
+      "fonte": "transcricao",
+      "citacao": "A gente está há doze anos aqui em Rio Verde",
+      "status": "confirmado"
+    }
+  },
+  "dores": [
+    {
+      "texto": "Falta de vaga perto: pacientes viajavam até Goiânia para fazer o exame",
+      "fonte": "transcricao",
+      "citacao": "Muita gente tinha que ir para Goiânia fazer o exame e voltava só para buscar o resultado",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Cidades vizinhas sem ressonância",
+      "fonte": "transcricao",
+      "citacao": "vem muita gente de Santa Helena, de Montividiu e de Jataí, porque nessas cidades não tem ressonância",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Laudo demorado faz o paciente perder o retorno com o médico",
+      "fonte": "transcricao",
+      "citacao": "Em alguns lugares o laudo demora mais de uma semana e o paciente perde o retorno com o médico",
+      "status": "confirmado"
+    }
+  ],
+  "diferenciais": [
+    {
+      "texto": "Parcelamento: em até 10 vezes, 10 sem juros",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Formas de pagamento: Pix, Cartão de crédito, Cartão de débito",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Estacionamento: estacionamento próprio para pacientes",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Equipamento ou estrutura diferenciada: ressonância de 1,5 Tesla",
+      "fonte": "mapa",
+      "citacao": "",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Tomógrafo de 64 canais",
+      "fonte": "transcricao",
+      "citacao": "o tomógrafo é de 64 canais",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Laudo em até 48 horas e resultado online pelo celular",
+      "fonte": "transcricao",
+      "citacao": "O laudo sai em até 48 horas e o paciente acessa o resultado online, pelo celular",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Atendimento aos sábados pela manhã, das 7h às 12h",
+      "fonte": "transcricao",
+      "citacao": "abrimos aos sábados pela manhã, das sete ao meio-dia",
+      "status": "confirmado"
+    },
+    {
+      "texto": "Encaixe no mesmo dia quando há vaga",
+      "fonte": "transcricao",
+      "citacao": "Quando tem vaga a gente encaixa no mesmo dia",
+      "status": "a_confirmar"
+    }
+  ],
+  "convenios": {
+    "situacao": "sim",
+    "lista": [
+      "Plano Vale Saúde",
+      "Assistência Rio",
+      "Saúde Cerrado",
+      "Prev Goiás"
+    ],
+    "fonte": "transcricao",
+    "citacao": "Os principais aqui são o Plano Vale Saúde, a Assistência Rio, o Saúde Cerrado e o Prev Goiás",
+    "status": "a_confirmar"
+  },
+  "depoimentos": {
+    "tem": "nao",
+    "vai_enviar": null,
+    "vai_gravar": "sim",
+    "responsavel": "Recepção",
+    "prazo": "28/10/2026",
+    "prazo_envio": ""
+  },
+  "video": {
+    "opcao": "cliente",
+    "responsavel": "Dra. Helena",
+    "prazo": "30/10/2026",
+    "observacao": ""
+  },
+  "dominio": {
+    "modo": "escolhido",
+    "escolhido": "ressonanciarioverde.com.br"
+  },
+  "base_banner": 2,
+  "cores": {
+    "marca": "#29527b",
+    "marca_escura": "#172d44",
+    "destaque": "#f0aa27",
+    "apoio": "#c7860e",
+    "origem": "logo",
+    "da_logo": [
+      "#29527b",
+      "#f0aa27"
+    ]
+  },
+  "cidades": [
+    "Rio Verde",
+    "Santa Helena de Goiás",
+    "Montividiu",
+    "Maurilândia",
+    "Acreúna",
+    "Jataí"
+  ],
+  "verba": {
+    "mensal": 3000,
+    "paginas": 2
+  },
+  "autorizacoes": {
+    "preco": false
+  },
+  "publico": "Pacientes encaminhados por ortopedistas e neurologistas, muitos exames de joelho, ombro e coluna; bastante atendimento particular.",
+  "observacoes": [
+    "Sem preço na página e nos anúncios (pedido da Dra. Helena).",
+    "Convênios: os quatro principais citados; a lista completa vem pelo grupo."
+  ]
+}

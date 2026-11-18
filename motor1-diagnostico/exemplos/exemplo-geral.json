@@ -1,0 +1,450 @@
+{
+  "versao_dados": "4",
+  "meta": {
+    "gerado_por": "Agente de Diagnóstico Win7",
+    "aviso": "EXEMPLO FICTÍCIO de segmento fora da saúde. Empresa, pessoas e números são inventados; distâncias aproximadas."
+  },
+  "cliente": {
+    "nome": "Torque Auto Center",
+    "nome_curto": "a Torque",
+    "setor": "geral",
+    "cidade": "Anápolis",
+    "uf": "GO",
+    "segmento": "Oficina mecânica e auto center",
+    "servicos_foco": [
+      "Alinhamento e balanceamento",
+      "Freios",
+      "Troca de óleo"
+    ],
+    "data_reuniao": "22/10/2026",
+    "links": {
+      "google": "https://maps.google.com/?cid=exemplo-torque",
+      "site": "https://torqueautocenter.exemplo.com.br",
+      "instagram": "https://instagram.com/torqueautocenter.exemplo"
+    }
+  },
+  "subtitulo": "Exemplo fictício. Como o auto center aparece hoje para quem busca o serviço em Anápolis, e o plano para os anúncios.",
+  "restricoes": {
+    "cores_vetadas": [],
+    "nao_prometer": [
+      "serviço pronto em 30 minutos"
+    ]
+  },
+  "impressao": {
+    "titulo": "Bem avaliado no mapa, invisível no patrocinado",
+    "frase": "A Torque tem **nota alta e boa estrutura**, mas não anuncia quando o motorista busca alinhamento ou freio, e o site não tem página para receber o anúncio.",
+    "achados_principais": [
+      "Dois concorrentes anunciam para **alinhamento em Anápolis**; a Torque não aparece no patrocinado.",
+      "O site é uma página única de apresentação: o anúncio de freios não teria para onde levar o cliente.",
+      "Nota 4,7 com muitas avaliações: é o argumento mais forte e hoje não aparece em lugar nenhum fora do mapa."
+    ],
+    "ganhos_rapidos": [
+      "Criar a página de alinhamento e balanceamento antes de ligar a campanha.",
+      "Colocar o botão de WhatsApp no site e no perfil do Google.",
+      "Cadastrar os serviços no perfil do Google."
+    ]
+  },
+  "ouvimos": {
+    "titulo": "O que ouvimos na conversa com a empresa",
+    "intro": "Registro da conversa do comercial com a empresa. Se algo estiver incompleto, ajustamos juntos.",
+    "dores": [
+      {
+        "titulo": "Elevador parado de segunda a quarta",
+        "texto": "O movimento se concentra no fim de semana e [[o início da semana fica com o elevador vazio]].",
+        "citacao": "Sábado não dou conta, segunda eu fico olhando para a porta."
+      },
+      {
+        "titulo": "Cliente só aparece quando o carro quebra",
+        "texto": "A maior parte chega por indicação e [[só em emergência]]; quase ninguém agenda revisão preventiva."
+      }
+    ],
+    "trunfos": [
+      {
+        "titulo": "Alinhamento 3D e garantia por escrito",
+        "texto": "Equipamento de alinhamento 3D e garantia de 6 meses nas peças de freio: argumentos que nenhum concorrente da cidade mostra no anúncio."
+      }
+    ],
+    "fonte": "conversa do comercial com a empresa em 15/10/2026 (informado). Exemplo fictício."
+  },
+  "presenca": {
+    "google": {
+      "nome": "Torque Auto Center",
+      "categoria": "Oficina mecânica",
+      "url": "https://maps.google.com/?cid=exemplo-torque",
+      "nota": {
+        "valor": 4.7,
+        "fonte": "perfil público do Google (exemplo)",
+        "status": "observado"
+      },
+      "avaliacoes": {
+        "valor": 312,
+        "fonte": "perfil público do Google (exemplo)",
+        "status": "observado"
+      },
+      "endereco": "Bairro Jundiaí, Anápolis/GO (exemplo)",
+      "horario": "Seg. a sex. 8h às 18h · sáb. 8h às 13h",
+      "telefone": "(62) 0000-0000",
+      "observado_em": "16/10/2026",
+      "origem": "observado",
+      "como": "Leitura do perfil público com print.",
+      "criterios": {
+        "reivindicado": "sim",
+        "categoria_correta": {
+          "valor": "parcial",
+          "evidencia": "Categoria principal é oficina mecânica; falta a categoria de alinhamento e balanceamento."
+        },
+        "horario_completo": "sim",
+        "contato_no_perfil": {
+          "valor": "parcial",
+          "evidencia": "Tem telefone, mas nenhum link para o WhatsApp."
+        },
+        "fotos_reais": "sim",
+        "servicos_cadastrados": "nao",
+        "responde_avaliacoes": {
+          "valor": "parcial",
+          "evidencia": "Responde às positivas; duas negativas sem resposta."
+        },
+        "posts_recentes": "nao"
+      },
+      "achados": [
+        {
+          "texto": "Nota 4,7 com mais de 300 avaliações: a extensão de local leva esse número para dentro do anúncio.",
+          "tipo": "ok"
+        },
+        {
+          "texto": "Sem serviços cadastrados, o perfil não aparece para quem busca o serviço específico.",
+          "tipo": "alerta"
+        }
+      ]
+    },
+    "busca": {
+      "origem": "observado",
+      "como": "Busca anônima no navegador, a partir de Anápolis.",
+      "consultas": [
+        {
+          "termo": "alinhamento e balanceamento anápolis",
+          "observado_em": "16/10/2026",
+          "resultados": [
+            {
+              "tipo": "patrocinado",
+              "dominio": "concorrente-b.exemplo",
+              "nome": "Concorrente B",
+              "titulo": "Alinhamento e Balanceamento | Anápolis",
+              "descricao": "Atendimento sem agendamento. Parcele no cartão."
+            },
+            {
+              "tipo": "patrocinado",
+              "dominio": "rede-pneus.exemplo",
+              "nome": "Rede de pneus",
+              "titulo": "Pneus e Alinhamento com Desconto",
+              "descricao": "Compre online e instale na loja."
+            },
+            {
+              "tipo": "mapa",
+              "dominio": "Google Maps",
+              "nome": "3 perfis locais",
+              "titulo": "Torque aparece em 1º no mapa",
+              "descricao": "Nota mais alta da lista."
+            },
+            {
+              "ausente": true,
+              "tipo": "patrocinado",
+              "dominio": "torqueautocenter.exemplo.com.br",
+              "nome": "Torque",
+              "marca": "A Torque não anuncia",
+              "titulo": "Espaço vazio no patrocinado",
+              "descricao": "Quem busca o serviço vê primeiro quem anuncia."
+            }
+          ]
+        }
+      ],
+      "criterios": {
+        "aparece_mapa": {
+          "valor": "sim",
+          "evidencia": "1º lugar no mapa para alinhamento."
+        },
+        "aparece_organico": {
+          "valor": "nao",
+          "evidencia": "O site não aparece na primeira página para o serviço."
+        },
+        "anuncia_exame_foco": "nao",
+        "a_frente_dos_concorrentes": "parcial",
+        "busca_pelo_nome": "sim",
+        "marca_protegida": "nd"
+      },
+      "achados": [
+        {
+          "texto": "Dois anunciantes aparecem antes do mapa: quem decide rápido nem chega a ver a nota da Torque.",
+          "tipo": "alerta"
+        }
+      ]
+    },
+    "site": {
+      "url": "https://torqueautocenter.exemplo.com.br",
+      "observado_em": "16/10/2026",
+      "origem": "verificado",
+      "como": "Site aberto no computador e no celular.",
+      "criterios": {
+        "existe": "sim",
+        "https": "sim",
+        "celular": "sim",
+        "rapido": {
+          "valor": "parcial",
+          "evidencia": "Galeria de fotos pesada no topo: demora para abrir no 4G."
+        },
+        "pagina_por_exame": "nao",
+        "convenios_visiveis": {
+          "valor": "nao",
+          "evidencia": "Não informa parcelamento nem formas de pagamento."
+        },
+        "endereco_como_chegar": "sim",
+        "contato_whatsapp": {
+          "valor": "nao",
+          "evidencia": "Só o telefone fixo no rodapé."
+        },
+        "politica_privacidade": "nao",
+        "tag_google": "nao"
+      },
+      "achados": [
+        {
+          "texto": "Página única de apresentação: cada serviço anunciado precisa de uma página própria com o termo da busca no título.",
+          "tipo": "alerta"
+        }
+      ]
+    }
+  },
+  "fontes_extras": [
+    {
+      "fonte": "Conversa comercial",
+      "detalhe": "Relato do comercial",
+      "status": "informado",
+      "data": "15/10/2026",
+      "como": "Dores, diferenciais e dias de menor movimento ditos pela empresa."
+    }
+  ],
+  "agenda": {
+    "itens": [
+      {
+        "nome": "Alinhamento e balanceamento",
+        "horarios_vazios": {
+          "valor": 90,
+          "fonte": "estimativa da empresa para segunda a quarta",
+          "status": "estimado"
+        },
+        "ticket": {
+          "valor": 160,
+          "fonte": "ticket médio informado na conversa",
+          "status": "informado"
+        }
+      },
+      {
+        "nome": "Freios",
+        "horarios_vazios": {
+          "valor": 30,
+          "fonte": "estimativa da empresa",
+          "status": "estimado"
+        },
+        "ticket": {
+          "valor": 480,
+          "fonte": "ticket médio informado na conversa",
+          "status": "informado"
+        }
+      }
+    ],
+    "leitura": "Preencher **1 em cada 3 horários vazios** do início da semana já paga a verba do Google."
+  },
+  "raio": {
+    "titulo": "Raio de atuação sugerido para os anúncios",
+    "intro": "Começamos onde o motorista chega com facilidade e abrimos para as cidades vizinhas conforme o painel mostrar demanda.",
+    "recomendacao_km": 35,
+    "recomendacao_texto": "Raio para começar a Etapa 1: Anápolis e as cidades a até 35 km.",
+    "zonas": [
+      {
+        "nome": "Zona 1 · Base",
+        "km_ate": 35,
+        "estrategia": "Defender a cidade sede e encher o elevador do início da semana.",
+        "cidades": [
+          { "nome": "Anápolis", "uf": "GO", "km": 0 },
+          { "nome": "Nerópolis", "uf": "GO", "km": 30 },
+          { "nome": "Abadiânia", "uf": "GO", "km": 33 }
+        ]
+      },
+      {
+        "nome": "Zona 2 · Crescimento",
+        "km_ate": 70,
+        "estrategia": "Motorista que passa pela BR e precisa de serviço no mesmo dia.",
+        "cidades": [
+          { "nome": "Goiânia", "uf": "GO", "km": 55 },
+          { "nome": "Silvânia", "uf": "GO", "km": 60 },
+          { "nome": "Pirenópolis", "uf": "GO", "km": 65 }
+        ]
+      },
+      {
+        "nome": "Zona 3 · Oportunidade",
+        "km_ate": 110,
+        "estrategia": "Entrada seletiva por freios e garantia, na Etapa 3.",
+        "cidades": [
+          { "nome": "Jaraguá", "uf": "GO", "km": 85 }
+        ]
+      }
+    ],
+    "fonte": "Distâncias por estrada aproximadas (exemplo), a confirmar no planejamento da campanha."
+  },
+  "termos": {
+    "titulo": "Termos de pesquisa que o cliente usa, por serviço",
+    "intro": "Lista de partida por serviço e por intenção de busca. Só correspondência exata e de frase.",
+    "frentes": [
+      {
+        "frente": "Alinhamento e balanceamento",
+        "grupos": [
+          {
+            "intencao": "Serviço + cidade",
+            "termos": [
+              { "termo": "alinhamento e balanceamento anápolis", "correspondencias": ["exata", "frase"], "prioridade": "alta" },
+              { "termo": "alinhamento anápolis", "correspondencias": ["exata", "frase"], "prioridade": "alta" },
+              { "termo": "balanceamento perto de mim", "correspondencias": ["frase"], "prioridade": "media" }
+            ]
+          },
+          {
+            "intencao": "Preço",
+            "termos": [
+              { "termo": "preço alinhamento e balanceamento anápolis", "correspondencias": ["exata", "frase"], "prioridade": "alta" },
+              { "termo": "quanto custa alinhamento", "correspondencias": ["frase"], "prioridade": "media" }
+            ]
+          }
+        ]
+      },
+      {
+        "frente": "Freios",
+        "grupos": [
+          {
+            "intencao": "Serviço + cidade",
+            "termos": [
+              { "termo": "troca de pastilha de freio anápolis", "correspondencias": ["exata", "frase"], "prioridade": "alta" },
+              { "termo": "conserto de freio anápolis", "correspondencias": ["exata", "frase"], "prioridade": "alta" }
+            ]
+          },
+          {
+            "intencao": "Urgência",
+            "termos": [
+              { "termo": "freio fazendo barulho", "correspondencias": ["frase"], "prioridade": "media" },
+              { "termo": "oficina de freio aberta agora", "correspondencias": ["frase"], "prioridade": "media" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "conduta": {
+    "titulo": "O plano para cada achado",
+    "itens": [
+      {
+        "responde": "Busca no Google",
+        "titulo": "Campanhas de pesquisa por serviço",
+        "texto": "Uma campanha para alinhamento e outra para freios, com os termos acima, só exata e frase, e o raio da Etapa 1."
+      },
+      {
+        "responde": "Site de página única",
+        "titulo": "Página de destino por serviço no padrão Win7",
+        "texto": "Alinhamento na raiz do domínio e freios em subcaminho, com o termo do anúncio no título, formas de pagamento e WhatsApp sempre visível."
+      },
+      {
+        "responde": "Sem medição",
+        "titulo": "Medir cada contato",
+        "texto": "Gerenciador de Tags e conversão de contato pelo WhatsApp e pelo telefone antes de ligar a verba."
+      },
+      {
+        "responde": "Google Meu Negócio",
+        "titulo": "Perfil pronto para a extensão de local",
+        "texto": "Serviços cadastrados, categoria de alinhamento e link do WhatsApp: a nota 4,7 aparece junto do anúncio."
+      }
+    ]
+  },
+  "etapas": [
+    {
+      "nome": "Etapa 1 · Calibração",
+      "foco": "dados reais",
+      "acoes": [
+        "Página de alinhamento e tag instaladas",
+        "Campanha de alinhamento no raio de 35 km",
+        "Termos só em exata e frase"
+      ],
+      "meta": "custo por contato medido e primeiras segundas-feiras com o elevador ocupado"
+    },
+    {
+      "nome": "Etapa 2 · Otimização",
+      "foco": "eficiência",
+      "acoes": [
+        "Negativar termos que não viram serviço",
+        "Abrir a campanha de freios",
+        "Concentrar a verba de segunda a quarta"
+      ],
+      "meta": "custo por serviço em queda"
+    },
+    {
+      "nome": "Etapa 3 · Expansão",
+      "foco": "escala",
+      "acoes": [
+        "Abrir a Zona 2 e a Zona 3",
+        "Campanha de troca de óleo e revisão"
+      ],
+      "meta": "início da semana com movimento parecido com o sábado"
+    }
+  ],
+  "projecao": {
+    "verba": {
+      "valor": 3000,
+      "fonte": "verba sugerida total (exemplo)",
+      "status": "informado"
+    },
+    "ticket": {
+      "valor": 220,
+      "fonte": "ticket médio informado",
+      "status": "informado"
+    },
+    "cenarios": [
+      {
+        "nome": "Conservador",
+        "custo_contato": { "valor": 9, "fonte": "premissa do exemplo", "status": "estimado" },
+        "conversao": { "valor": 0.2, "fonte": "premissa do exemplo", "status": "estimado" }
+      },
+      {
+        "nome": "Realista",
+        "custo_contato": { "valor": 7, "fonte": "premissa do exemplo", "status": "estimado" },
+        "conversao": { "valor": 0.25, "fonte": "premissa do exemplo", "status": "estimado" }
+      },
+      {
+        "nome": "Otimista",
+        "custo_contato": { "valor": 5, "fonte": "premissa do exemplo", "status": "estimado" },
+        "conversao": { "valor": 0.3, "fonte": "premissa do exemplo", "status": "estimado" }
+      }
+    ],
+    "nota": "Os números reais aparecem no painel a partir da Etapa 1."
+  },
+  "pendencias": [],
+  "verba": {
+    "titulo": "Verba sugerida para os anúncios",
+    "intro": "Ponto de partida por campanha. A verba cresce por etapa, conforme os dados.",
+    "frentes": [
+      {
+        "frente": "Alinhamento e balanceamento",
+        "motivo": "Mais busca e mais horário vazio.",
+        "valor": { "valor": 1500, "fonte": "sugestão da equipe (exemplo)", "status": "informado" }
+      },
+      {
+        "frente": "Freios",
+        "motivo": "Maior ticket; entra na Etapa 2.",
+        "valor": { "valor": 1500, "fonte": "sugestão da equipe (exemplo)", "status": "informado" }
+      }
+    ]
+  },
+  "perguntas_reuniao": [
+    "A empresa já tem conta do Google Ads? Quem é o administrador?",
+    "Em quanto tempo a equipe costuma responder o WhatsApp?",
+    "Atendem frota de empresas ou parceria com seguradora?"
+  ],
+  "conclusao": {
+    "titulo": "A nota já convence. Falta a Torque aparecer antes de quem anuncia.",
+    "texto": "Na reunião de onboarding confirmamos os pontos acima e começamos a Etapa 1."
+  }
+}

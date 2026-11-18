@@ -1,0 +1,419 @@
+{
+  "schema": "w7-mapa-onboarding",
+  "versao": 1,
+  "gerado_em": "2026-10-14T20:28:33.412Z",
+  "cliente": {
+    "nome": "Clínica Vértice Imagem",
+    "cidade": "Rio Verde",
+    "uf": "GO",
+    "setor": "saude",
+    "data_reuniao": "21/10/2026"
+  },
+  "diagnostico": {
+    "placar": 45,
+    "classe": "Base frágil",
+    "pilares": {
+      "busca": 42,
+      "site": 40,
+      "google": 55
+    }
+  },
+  "decisoes": {
+    "verba": {
+      "modo": "mensal",
+      "mensal": 3000,
+      "paginas": 2,
+      "minimo_por_pagina": 1500,
+      "por_pagina_mes": 1500,
+      "por_pagina_dia": 50
+    },
+    "pagina_principal": "Ressonância magnética",
+    "pagina_principal_recomendada": "Ressonância magnética",
+    "base_banner": {
+      "n": 2,
+      "nome": "Ondas"
+    },
+    "servicos": [
+      "Ressonância magnética",
+      "Tomografia"
+    ],
+    "servicos_proxima_etapa": [
+      "Ultrassonografia"
+    ],
+    "diferenciais": [
+      {
+        "rotulo": "Parcelamento",
+        "detalhe": "em até 10 vezes, 10 sem juros"
+      },
+      {
+        "rotulo": "Formas de pagamento",
+        "detalhe": "Pix, Cartão de crédito, Cartão de débito"
+      },
+      {
+        "rotulo": "Estacionamento",
+        "detalhe": "estacionamento próprio para pacientes"
+      },
+      {
+        "rotulo": "Equipamento ou estrutura diferenciada",
+        "detalhe": "ressonância de 1,5 Tesla"
+      }
+    ],
+    "convenios": {
+      "situacao": "sim",
+      "pedir_lista": true,
+      "observacao": ""
+    },
+    "cidades": {
+      "atuar": [
+        {
+          "nome": "Rio Verde",
+          "uf": "GO",
+          "km": 0
+        },
+        {
+          "nome": "Santa Helena de Goiás",
+          "uf": "GO",
+          "km": 35
+        },
+        {
+          "nome": "Montividiu",
+          "uf": "GO",
+          "km": 50
+        },
+        {
+          "nome": "Maurilândia",
+          "uf": "GO",
+          "km": 70
+        },
+        {
+          "nome": "Acreúna",
+          "uf": "GO",
+          "km": 78
+        },
+        {
+          "nome": "Jataí",
+          "uf": "GO",
+          "km": 95
+        }
+      ],
+      "nao_atuar": [
+        {
+          "nome": "Paraúna",
+          "uf": "GO",
+          "km": 105
+        }
+      ],
+      "sem_decisao": []
+    },
+    "depoimentos": {
+      "tem": "nao",
+      "vai_enviar": null,
+      "vai_gravar": "sim",
+      "responsavel": "Recepção",
+      "prazo": "28/10/2026",
+      "prazo_envio": ""
+    },
+    "video_home": {
+      "opcao": "cliente",
+      "responsavel": "Dra. Helena",
+      "prazo": "30/10/2026",
+      "observacao": ""
+    },
+    "dominio": {
+      "modo": "escolhido",
+      "escolhido": "ressonanciarioverde.com.br",
+      "sugestoes": [
+        {
+          "dominio": "ressonanciarioverde.com.br",
+          "status": "disponivel"
+        },
+        {
+          "dominio": "ressonanciaemrioverde.com.br",
+          "status": "disponivel"
+        },
+        {
+          "dominio": "rioverderessonancia.com.br",
+          "status": "disponivel"
+        },
+        {
+          "dominio": "ressonanciarioverdego.com.br",
+          "status": "disponivel"
+        }
+      ]
+    },
+    "dados_cliente": [
+      {
+        "campo": "nome",
+        "rotulo": "Nome que aparece na página e no Google",
+        "valor": "Clínica Vértice Imagem",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "endereco",
+        "rotulo": "Endereço",
+        "valor": "Setor Central, Rio Verde/GO (exemplo)",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "telefone",
+        "rotulo": "Telefone",
+        "valor": "(64) 0000-0000",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "whatsapp",
+        "rotulo": "WhatsApp que recebe os contatos",
+        "valor": "(64) 99999-0000",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "horario",
+        "rotulo": "Horário de atendimento",
+        "valor": "Seg. a sex. 7h às 19h · sáb. 7h às 12h",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "site",
+        "rotulo": "Site atual",
+        "valor": "https://verticeimagem.exemplo.com.br",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "rt",
+        "rotulo": "Responsável técnico (nome e CRM)",
+        "valor": "Dra. Helena Prado · CRM/GO 00000",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "razao_social",
+        "rotulo": "Razão social (vai na política de privacidade)",
+        "valor": "Vértice Diagnóstico por Imagem Ltda (fictícia)",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "cnpj",
+        "rotulo": "CNPJ",
+        "valor": "00.000.000/0001-91",
+        "status": "ok",
+        "correcao": ""
+      },
+      {
+        "campo": "email_privacidade",
+        "rotulo": "E-mail para pedidos sobre dados pessoais",
+        "valor": "privacidade@verticeimagem.exemplo.com.br",
+        "status": "ok",
+        "correcao": ""
+      }
+    ]
+  },
+  "lp_modelo": "https://modelo.win7.ai/m/dzllmcvngfby/",
+  "termos": [
+    {
+      "frente": "Ressonância magnética",
+      "grupos": [
+        {
+          "intencao": "Exame + cidade",
+          "termos": [
+            {
+              "termo": "ressonância magnética rio verde",
+              "correspondencias": [
+                "exata",
+                "frase"
+              ],
+              "prioridade": "alta"
+            },
+            {
+              "termo": "ressonância rio verde",
+              "correspondencias": [
+                "exata",
+                "frase"
+              ],
+              "prioridade": "alta"
+            },
+            {
+              "termo": "clínica de ressonância em rio verde",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "media"
+            }
+          ]
+        },
+        {
+          "intencao": "Preço",
+          "termos": [
+            {
+              "termo": "ressonância magnética preço rio verde",
+              "correspondencias": [
+                "exata",
+                "frase"
+              ],
+              "prioridade": "alta"
+            },
+            {
+              "termo": "quanto custa ressonância magnética",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "media"
+            }
+          ]
+        },
+        {
+          "intencao": "Convênio",
+          "termos": [
+            {
+              "termo": "ressonância unimed rio verde",
+              "correspondencias": [
+                "exata",
+                "frase"
+              ],
+              "prioridade": "alta"
+            },
+            {
+              "termo": "ressonância ipasgo",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "media"
+            }
+          ]
+        },
+        {
+          "intencao": "Região do exame",
+          "termos": [
+            {
+              "termo": "ressonância de joelho rio verde",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "media"
+            },
+            {
+              "termo": "ressonância de coluna rio verde",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "media"
+            }
+          ]
+        },
+        {
+          "intencao": "Cidades vizinhas",
+          "termos": [
+            {
+              "termo": "ressonância magnética santa helena de goiás",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "media"
+            },
+            {
+              "termo": "ressonância magnética jataí",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "baixa"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "frente": "Tomografia",
+      "grupos": [
+        {
+          "intencao": "Exame + cidade",
+          "termos": [
+            {
+              "termo": "tomografia rio verde",
+              "correspondencias": [
+                "exata",
+                "frase"
+              ],
+              "prioridade": "alta"
+            },
+            {
+              "termo": "tomografia computadorizada rio verde",
+              "correspondencias": [
+                "exata",
+                "frase"
+              ],
+              "prioridade": "alta"
+            }
+          ]
+        },
+        {
+          "intencao": "Urgência",
+          "termos": [
+            {
+              "termo": "tomografia hoje rio verde",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "media"
+            },
+            {
+              "termo": "tomografia perto de mim",
+              "correspondencias": [
+                "frase"
+              ],
+              "prioridade": "media"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "confirmacoes": [
+    {
+      "texto": "A clínica já tem conta do Google Ads? Quem é o administrador?",
+      "status": "ok",
+      "obs": ""
+    },
+    {
+      "texto": "Qual convênio traz mais pacientes de ressonância?",
+      "status": "ok",
+      "obs": ""
+    }
+  ],
+  "pendencias": [
+    {
+      "texto": "Registrar o domínio ressonanciarioverde.com.br e apontar para a página",
+      "responsavel": "Win7",
+      "prazo": ""
+    },
+    {
+      "texto": "Enviar a lista completa de convênios no grupo do WhatsApp",
+      "responsavel": "Cliente",
+      "prazo": ""
+    },
+    {
+      "texto": "Gravar depoimentos em vídeo",
+      "responsavel": "Recepção",
+      "prazo": "28/10/2026",
+      "obs": ""
+    },
+    {
+      "texto": "Enviar o roteiro do vídeo de apresentação",
+      "responsavel": "Win7",
+      "prazo": ""
+    },
+    {
+      "texto": "Gravar o vídeo a partir do roteiro",
+      "responsavel": "Dra. Helena",
+      "prazo": "30/10/2026",
+      "obs": ""
+    }
+  ],
+  "participantes": "Dra. Helena Prado (diretora), Marcos (gerente) e Win7 (fictício)",
+  "observacoes": ""
+}

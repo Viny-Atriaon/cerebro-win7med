@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Ponto 1 da GOV-ENFORCE-01: auditoria do código + regressões (Motor 1, robô 3, API do start) antes de todo push.
+set -u
+cd "$(git rev-parse --show-toplevel)" || exit 1
+# trava do repositório público (ADR-009): a história antiga (privada, com clientes reais) nunca vai para o cerebro-win7med.
+# .githooks/raiz-privada guarda a raiz dessa história; num clone novo do público o commit nem existe e a trava não pesa.
+URL="${2:-}"
+if [ -f .githooks/raiz-privada ] && printf '%s' "$URL" | grep -qE 'cerebro-win7med(\.git)?/?$'; then
+  RAIZ=$(tr -dc '0-9a-f' < .githooks/raiz-privada)
+  while read -r _ sha _ _; do
+    case "$sha" in 0000000000000000000000000000000000000000|"") continue ;; esac
+    if git cat-file -e "$RAIZ^{commit}" 2>/dev/null && git merge-base --is-ancestor "$RAIZ" "$sha" 2>/dev/null; then
+      echo "push bloqueado: este envio leva a história privada para o repositório público (ADR-009)."
+      echo "Use o remoto do histórico (cerebro-win7med-historico) ou trabalhe no ramo main novo."; exit 1
+    fi
+  done
+fi
+echo "── pre-push: auditoria do código (padrão v3.5)"
+bash scripts/audit.sh . > /tmp/pre-push-audit.txt 2>&1 || {
+  grep -E '^❌' /tmp/pre-push-audit.txt
+  echo "push bloqueado: corrija, ou registre waiver com prazo em .audit-waivers"; exit 1; }
+echo "── pre-push: regressão do Motor 1 (motor, agente e privacidade)"
+node motor1-diagnostico/scripts/teste-regressao.mjs > /tmp/pre-push-tests.txt 2>&1 || {
+  tail -25 /tmp/pre-push-tests.txt; echo "push bloqueado: regressão falhando"; exit 1; }
+echo "── pre-push: regressão do robô 3 (ficha, plano, campanhas, página real)"
+node motor2-execucao/scripts/teste-robo3.mjs > /tmp/pre-push-robo3.txt 2>&1 || {
+  grep -E '^❌' /tmp/pre-push-robo3.txt; echo "push bloqueado: regressão do robô 3 falhando"; exit 1; }
+echo "── pre-push: regressão da API do start (PHP, contas, limites, projetos salvos)"
+node start/testes/teste-api-abuso.mjs > /tmp/pre-push-start.txt 2>&1 || {
+  grep -E '^❌|não subiu' /tmp/pre-push-start.txt; echo "push bloqueado: regressão da API do start falhando"; exit 1; }
+echo "── pre-push: ok"

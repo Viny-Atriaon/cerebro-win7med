@@ -1,0 +1,36 @@
+# segredos
+.env
+.env.*
+!.env.example
+
+# dependências e caches
+node_modules/
+__pycache__/
+*.pyc
+
+# dados de clientes (nunca no git)
+clientes/
+saida/
+
+# saídas de QA fora das fixtures
+motor1-diagnostico/fixtures/**/qa/*.png
+*.log
+/tmp/
+
+# builds (dist/publico é um repositório git próprio, publicado à parte)
+dist/
+
+# vídeos base da LP modelo (pesados; ficam no servidor e na pasta do Viny)
+motor1-diagnostico/lp-modelo/base/*.mp4
+
+# histórico das conversas (cita cliente real e equipe; fica só no computador)
+historico/
+
+# robô 3: saídas geradas e arquivos de trabalho do publicador
+**/entregas-win7/
+motor2-execucao/exemplos/*/ficha-rascunho.json
+motor2-execucao/scripts/_raiz_previa/
+motor2-execucao/scripts/.previa-raiz-ok
+
+# acesso ao servidor e à Cloudflare (nunca no git)
+.segredos/
