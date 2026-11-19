@@ -4,6 +4,12 @@
 > **Repositório público** (ADR-009): este arquivo não leva nome de cliente, pasta de cliente, link com token, dado da equipe nem endereço do servidor. O estado de cada cliente real fica na pasta do cliente (fora do git, `LEIA-PRIMEIRO.md` ou `ESTADO.md` de lá) e nos projetos salvos do start.win7.ai. A história até 18/11/2026 (PR-001 a PR-022, com os clientes reais) está no repositório privado `Viny-Atriaon/cerebro-win7med-historico`.
 
 ## Último checkpoint
+- **Acessos com senha temporária (19/11, adendo da ADR-008, pedido do Viny):** até aqui ninguém tinha entrado, porque o único acesso era o link de convite num arquivo local.
+  - **Acesso de administrador:** criado com `scripts/acessos_start.py`. Quem entra com a senha temporária é obrigado a criar a própria senha. A temporária vale até 26/11/2026.
+  - **O HTML para o Viny:** `.segredos/ACESSOS-START.html` (fora do git), com endereço, login, senha temporária e passo a passo.
+  - **Equipe:** "Adicionar pessoa" com senha temporária (o padrão) ou link; "Redefinir senha"; "Trocar minha senha" no menu da conta.
+  - **Conferido no servidor sem entrar no sistema:** conta ativa, marcada para trocar a senha; o hash confere com a senha do HTML; a semente foi absorvida.
+  - Commit `62f7c85`, PR-025.
 - **Organizar e voltar a uma versão (18/11 tarde, adendo da ADR-008, pedido do Viny):**
   - **Pastas:** qualquer pessoa da equipe cria e organiza. Chips na aba Projetos, seletor em cada projeto e, na Análise, "Pasta no sistema" e "Nova pasta".
   - **Quem fez:** "Feito por" e "Atualizado por" em cada projeto, com filtro "Feito por".
@@ -38,7 +44,7 @@
   - O pre-push recusa qualquer push que leve a história antiga para o público.
   - Primeiro commit do público: `64b7b67` (PR-023). A história anterior termina em `1b0c054`, no histórico.
 - **Estado do sistema (18/11):**
-  - `npm test`: Motor 1 ok, robô 3 com 60 checagens ok, API do start com 89 checagens ok (pastas, versões, cópia cifrada do dia).
+  - `npm test`: Motor 1 ok, robô 3 com 60 checagens ok, API do start com 108 checagens ok (pastas, versões, cópia cifrada do dia, senha temporária).
   - `npm run qa:start`: ok, de ponta a ponta no navegador. Convite, Gerar, onboarding e mapeamento salvos; o projeto reabre em outro navegador sem nada guardado, com as respostas; 1440 e 375 px sem rolagem lateral e sem erro de console.
   - `bash scripts/audit.sh .`: 24 ✅ · 0 ❌ · 4 ⚠️ (sem banco, carga e capacidade não medidas, auditoria de dependências só com `--deps`: ver CONFORMIDADE).
   - `npm run audit:runtime -- --abuse`: 8 ✅ · 0 ❌.
@@ -54,7 +60,7 @@
 - 18/11: repositório público com história saneada e histórico privado (ADR-009).
 
 ## Próximos 3 passos (concretos, executáveis)
-1. O Viny abre o link de `.segredos/start-convites.txt`, cria o acesso (e-mail dele e senha) e convida a equipe pela aba Equipe.
+1. O Viny abre `.segredos/ACESSOS-START.html`, entra, cria a senha e adiciona a equipe pela aba Equipe. Se quiser, cancela em Equipe o convite antigo, o sem e-mail.
 2. O Viny guarda a chave da cópia do dia (`.segredos/start-copia.env`) no gerenciador de senhas.
 3. Ensaio de restauração uma vez por mês, com a cópia mais recente de `Documentos\Backups Win7\cerebro`.
 

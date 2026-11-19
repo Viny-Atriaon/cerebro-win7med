@@ -208,3 +208,19 @@
 - **Motivo:** pedido do Viny em 18/11: salvar, arquivar, pastas e o nome de quem fez para identificar; backup autorizado
 - **Estado verificado neste ponto:** `npm test` = Motor 1 ok + robô 3 60 ok + API 89 ok; `qa_start.py` ok (pasta pela Análise, Salvar no sistema, Salvar na apresentação, versão aberta e restaurada, 1440 e 375 px sem rolagem lateral nem erro de console); `bash scripts/audit.sh .` = 24 ✅ · 0 ❌ · 4 ⚠️; no ar: página 200, API 200, `api/lib/*` 403, cron criado, chave 0600. Primeira cópia gerada pelo cron às 17:17 (`cerebro-2026-11-18-171701.json.gz.enc`); tarefa Win7-BackupFora pelo agendador: baixou, conferiu o SHA-256 e o Drive cifrado (`cryptcheck`: 2 arquivos), GoogleX e MetaX iguais, `ok: true`; ensaio `restaurar-copia.mjs` abriu e gravou a cópia com a chave local; `audit-runtime.sh` = 10 ✅ · 0 ❌ (BKP-VERIFY-01a e 01b, BKP-REMEDIATE-01)
 
+## PR-025 · 19/11/2026 · Senha temporária e acesso de administrador (adendo ADR-008)
+- **Commit:** `62f7c85` · **Tipo:** adicionado
+- **Funcionalidades tocadas:** `start/api/index.php` (semente de contas, `/api/senha`, trava `TROCAR_SENHA`, `/api/equipe/usuarios`, `/api/equipe/redefinir`, temporária vencida), `start/index.html` (tela "Crie a sua senha", "Trocar minha senha", Adicionar pessoa com senha temporária, Redefinir senha, selo), `scripts/acessos_start.py` (novo), testes
+- **Adicionado:**
+  - senha temporária de 12 caracteres, que vale 7 dias, com troca obrigatória;
+  - acesso de administrador pelo script, que manda ao servidor só o hash;
+  - o HTML de acessos em `.segredos`, fora do git.
+- **Modificado:** Adicionar pessoa usa a senha temporária como padrão (o link de convite continua como opção); "Cancelar" também no convite sem e-mail
+- **Removido:** nada
+- **Motivo:** pedido do Viny em 19/11: "cadê esses acessos?", ele queria um acesso admin com senha temporária para depois liberar as outras pessoas
+- **Estado verificado neste ponto:**
+  - `npm test`: Motor 1 ok, robô 3 com 60 checagens ok, API com 108 ok.
+  - `qa_start.py` ok: criar a senha com a temporária, adicionar pessoa, redefinir e trocar a senha, em 1440 e 375 px.
+  - `audit.sh`: 24 ✅ · 0 ❌ · 4 ⚠️.
+  - No ar: a conta do administrador foi conferida pela API do cPanel, e o hash confere com o HTML sem entrar no sistema; `/api/projetos` sem sessão responde 401.
+

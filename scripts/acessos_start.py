@@ -99,7 +99,7 @@ ol li{{padding-left:4px}}
 ol b{{color:var(--tinta)}}
 .aviso{{background:var(--aviso);color:var(--aviso-tinta);border-radius:14px;padding:14px 16px;font-size:14.5px}}
 .rodape{{font-size:13px;color:var(--apagado)}}
-@media (max-width:560px){{.linha{{grid-template-columns:1fr auto}}.linha dt{{grid-column:1/-1}}.cartao{{padding:18px}}}}
+@media (max-width:560px){{.linha{{grid-template-columns:1fr auto}}.linha dd{{font-size:15px;overflow-wrap:normal;word-break:break-word}}.linha dt{{grid-column:1/-1}}.cartao{{padding:18px}}}}
 @media print{{button,.botao{{display:none}}}}
 </style>
 </head>
