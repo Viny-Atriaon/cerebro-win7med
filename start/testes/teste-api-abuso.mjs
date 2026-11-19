@@ -272,6 +272,19 @@ try {
   const lc = await R('POST', 'entrar', { email: 'comum@teste.local', senha: semPapel.j.senha_temporaria });
   await R('POST', 'senha', { atual: semPapel.j.senha_temporaria, nova: 'senha-da-pessoa-comum' }, lc.cookie);
   check((await R('POST', 'equipe/usuarios', { nome: 'X', email: 'x@teste.local' }, lc.cookie)).status === 403 && (await R('POST', 'equipe/redefinir', { email: 'nova@teste.local' }, lc.cookie)).status === 403, 'só o administrador cria pessoas e redefine senhas');
+  // super admin (19/11): o dono do sistema; nenhum outro administrador desativa nem redefine a senha dele
+  const tempDono = 'Dono-Temp-2345';
+  fs.writeFileSync(path.join(inst3.dados, 'usuarios-semente.json'), JSON.stringify([{ email: 'dono@teste.local', nome: 'Dono Teste', papel: 'admin', dono: true, hash: hashDe(tempDono) }, { email: 'admin@teste.local', desativar: true }]));
+  const ld = await R('POST', 'entrar', { email: 'dono@teste.local', senha: tempDono });
+  check(ld.status === 200 && ld.j.dono === true && ld.j.trocar_senha === true, 'super admin semeado entra com a temporária, marcado como dono');
+  check((await R('GET', 'eu', null, ck)).status === 401 && (await R('POST', 'entrar', { email: 'admin@teste.local', senha: 'nova-senha-do-admin' })).status === 401, 'a semente desativa o administrador genérico e derruba a sessão dele');
+  await R('POST', 'senha', { atual: tempDono, nova: 'senha-do-dono-nova' }, ld.cookie);
+  const adm2 = await R('POST', 'equipe/usuarios', { nome: 'Outro Admin', email: 'outro-admin@teste.local', papel: 'admin' }, ld.cookie);
+  const la = await R('POST', 'entrar', { email: 'outro-admin@teste.local', senha: adm2.j.senha_temporaria });
+  await R('POST', 'senha', { atual: adm2.j.senha_temporaria, nova: 'senha-do-outro-admin' }, la.cookie);
+  check((await R('POST', 'equipe/situacao', { email: 'dono@teste.local', ativo: false }, la.cookie)).j?.erro?.codigo === 'DONO' && (await R('POST', 'equipe/redefinir', { email: 'dono@teste.local' }, la.cookie)).j?.erro?.codigo === 'DONO', 'outro administrador não desativa nem redefine a senha do super admin');
+  check((await R('POST', 'equipe/convites', { nome: 'X', email: 'dono@teste.local' }, la.cookie)).status === 409 && (await R('POST', 'equipe/usuarios', { nome: 'X', email: 'dono@teste.local' }, la.cookie)).status === 409, 'ninguém cria conta ou convite por cima do e-mail do super admin');
+  check((await R('GET', 'equipe', null, la.cookie)).j.usuarios.find((x) => x.email === 'dono@teste.local')?.dono === true && (await R('GET', 'sessao', null, ld.cookie)).j.usuario.dono === true, 'a equipe e a sessão mostram quem é o super admin');
 } finally {
   await inst3.parar();
 }

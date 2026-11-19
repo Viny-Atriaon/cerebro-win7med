@@ -491,7 +491,7 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     eu = u;
     if (u.trocar_senha) { $('abas').hidden = true; $('conta').hidden = true; pedirSenha(true); return; }
     $('conta-botao').textContent = iniciais(u.nome);
-    $('conta-nome').textContent = u.nome; $('conta-email').textContent = u.email + (u.papel === 'admin' ? ' · administrador' : '');
+    $('conta-nome').textContent = u.nome; $('conta-email').textContent = u.email + (u.dono ? ' · super admin' : u.papel === 'admin' ? ' · administrador' : '');
     $('menu-equipe').hidden = u.papel !== 'admin';
     $('abas').hidden = false; $('conta').hidden = false;
     porta(null); listaVelha = true; mostrar();
@@ -796,9 +796,9 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     api('GET', 'equipe').then(function (r) {
       $('lista-pessoas').innerHTML = (r.usuarios || []).map(function (u) {
         var euMesmo = eu && u.email === eu.email;
-        return '<div class="pessoa"><div class="nome"><b>' + esc(u.nome) + (u.papel === 'admin' ? '<span class="selo">administrador</span>' : '') + (u.ativo ? '' : '<span class="selo off">desativada</span>') + (u.trocar_senha && u.ativo ? '<span class="selo pend">senha temporária</span>' : '') + '</b>' +
+        return '<div class="pessoa"><div class="nome"><b>' + esc(u.nome) + (u.dono ? '<span class="selo">super admin</span>' : u.papel === 'admin' ? '<span class="selo">administrador</span>' : '') + (u.ativo ? '' : '<span class="selo off">desativada</span>') + (u.trocar_senha && u.ativo ? '<span class="selo pend">senha temporária</span>' : '') + '</b>' +
           '<span>' + esc(u.email) + (u.ultimoAcesso ? ' · último acesso ' + esc(quando(u.ultimoAcesso)) : ' · ainda não entrou') + '</span></div>' +
-          (euMesmo ? '<span class="ajuda">você</span>' : '<div class="botoes"><button class="btn pequeno" type="button" data-redefinir="' + esc(u.email) + '" data-nome="' + esc(u.nome) + '">Redefinir senha</button>' +
+          (euMesmo ? '<span class="ajuda">você</span>' : u.dono ? '<span class="ajuda">só ele altera</span>' : '<div class="botoes"><button class="btn pequeno" type="button" data-redefinir="' + esc(u.email) + '" data-nome="' + esc(u.nome) + '">Redefinir senha</button>' +
             '<button class="btn pequeno' + (u.ativo ? ' perigo' : '') + '" type="button" data-email="' + esc(u.email) + '" data-ativo="' + (u.ativo ? '0' : '1') + '">' + (u.ativo ? 'Desativar' : 'Reativar') + '</button></div>') + '</div>';
       }).join('');
       var pend = r.convites || [];

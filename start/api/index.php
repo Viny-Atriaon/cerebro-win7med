@@ -38,7 +38,8 @@ if ($metodo !== 'GET') {
 const DIAS_SENHA_TEMPORARIA = 7;
 function usuarios(): array { return ler_json('usuarios.json', []); }
 function achar_usuario(string $email): ?array { foreach (usuarios() as $u) if ($u['email'] === $email) return $u; return null; }
-function usuario_publico(array $u): array { return ['email' => $u['email'], 'nome' => $u['nome'], 'papel' => $u['papel'], 'ativo' => !empty($u['ativo']), 'criado_em' => $u['criado_em'] ?? null, 'ultimoAcesso' => $u['ultimoAcesso'] ?? null, 'trocar_senha' => !empty($u['trocar_senha'])]; }
+function usuario_publico(array $u): array { return ['email' => $u['email'], 'nome' => $u['nome'], 'papel' => $u['papel'], 'ativo' => !empty($u['ativo']), 'criado_em' => $u['criado_em'] ?? null, 'ultimoAcesso' => $u['ultimoAcesso'] ?? null, 'trocar_senha' => !empty($u['trocar_senha']), 'dono' => !empty($u['dono'])]; }
+function eh_dono(string $email): bool { $u = achar_usuario($email); return $u !== null && !empty($u['dono']); }
 /** 12 letras e números sem os que confundem (0/O, 1/l/I), em 3 grupos: fácil de ditar e de digitar. */
 function senha_temporaria(): string {
     $a = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -81,9 +82,9 @@ function sessao(): ?array {
     if (!$s || $s['expira'] < agora_ms()) return null;
     $u = achar_usuario($s['email']);
     if (!$u || empty($u['ativo'])) return null;
-    return ['chave' => $chave, 'email' => $u['email'], 'nome' => $u['nome'], 'papel' => $u['papel'], 'trocar_senha' => !empty($u['trocar_senha'])];
+    return ['chave' => $chave, 'email' => $u['email'], 'nome' => $u['nome'], 'papel' => $u['papel'], 'trocar_senha' => !empty($u['trocar_senha']), 'dono' => !empty($u['dono'])];
 }
-function usuario_da_resposta(array $u): array { return ['nome' => $u['nome'], 'papel' => $u['papel'], 'email' => $u['email'], 'trocar_senha' => !empty($u['trocar_senha'])]; }
+function usuario_da_resposta(array $u): array { return ['nome' => $u['nome'], 'papel' => $u['papel'], 'email' => $u['email'], 'trocar_senha' => !empty($u['trocar_senha']), 'dono' => !empty($u['dono'])]; }
 function criar_sessao(array $u): string {
     $token = bin2hex(random_bytes(24));
     com_trava(function () use ($token, $u) {
@@ -150,10 +151,22 @@ if (is_file(caminho('usuarios-semente.json'))) com_trava(function () {
     if (!is_array($semente)) return;
     $lista = usuarios();
     foreach ($semente as $n) {
-        if (!is_array($n) || !filter_var($n['email'] ?? '', FILTER_VALIDATE_EMAIL) || !preg_match('/^\$2y\$/', (string) ($n['hash'] ?? ''))) continue;
+        if (!is_array($n) || !filter_var($n['email'] ?? '', FILTER_VALIDATE_EMAIL)) continue;
         $email = mb_strtolower($n['email']);
+        // {"email": x, "desativar": true}: tira o acesso (a conta fica, desativada) e derruba as sessões
+        if (!empty($n['desativar'])) {
+            foreach ($lista as &$x) if ($x['email'] === $email) { $x['ativo'] = false; unset($x['trocar_senha'], $x['temporaria_expira']); }
+            unset($x);
+            gravar_json('estado/sessoes.json', array_filter(ler_json('estado/sessoes.json', []), fn($v) => $v['email'] !== $email));
+            registrar('info', 'conta_desativada_publicacao', ['email' => $email]);
+            continue;
+        }
+        if (!preg_match('/^\$2y\$/', (string) ($n['hash'] ?? ''))) continue;
         $lista = array_values(array_filter($lista, fn($x) => $x['email'] !== $email));
-        $lista[] = ['email' => $email, 'nome' => texto($n['nome'] ?? 'Administrador', 80), 'papel' => ($n['papel'] ?? '') === 'equipe' ? 'equipe' : 'admin', 'hash' => $n['hash'], 'ativo' => true,
+        // super admin (dono): administrador que só ele mesmo altera; nenhum outro administrador desativa nem redefine a senha dele
+        if (!empty($n['dono'])) foreach ($lista as &$x) unset($x['dono']);
+        unset($x);
+        $lista[] = ['email' => $email, 'nome' => texto($n['nome'] ?? 'Administrador', 80), 'papel' => ($n['papel'] ?? '') === 'equipe' && empty($n['dono']) ? 'equipe' : 'admin', 'dono' => !empty($n['dono']), 'hash' => $n['hash'], 'ativo' => true,
             'trocar_senha' => true, 'temporaria_expira' => agora_ms() + DIAS_SENHA_TEMPORARIA * 86400e3, 'criado_em' => agora(), 'convidado_por' => 'publicação', 'ultimoAcesso' => null];
         gravar_json('estado/sessoes.json', array_filter(ler_json('estado/sessoes.json', []), fn($x) => $x['email'] !== $email));
         registrar('info', 'conta_semeada', ['email' => $email]);
@@ -458,6 +471,7 @@ if (str_starts_with($caminho, '/api/equipe')) {
         if ($nome === '') erro(400, 'NOME', 'Informe o nome da pessoa.');
         $existe = achar_usuario($email);
         if ($existe && !empty($existe['ativo'])) erro(409, 'CONTA', 'Essa pessoa já tem conta ativa.');
+        if ($existe && !empty($existe['dono'])) erro(409, 'CONTA', 'Esse e-mail é do super admin.');
         $token = bin2hex(random_bytes(20));
         com_trava(function () use ($token, $email, $nome, $papel, $s) {
             $todos = array_filter(ler_json('convites.json', []), fn($x) => $x['email'] !== $email);
@@ -478,7 +492,7 @@ if (str_starts_with($caminho, '/api/equipe')) {
         $senha = senha_temporaria();
         $r = com_trava(function () use ($email, $nome, $papel, $senha, $s) {
             $lista = usuarios();
-            foreach ($lista as $x) if ($x['email'] === $email && !empty($x['ativo'])) return 'existe';
+            foreach ($lista as $x) if ($x['email'] === $email && (!empty($x['ativo']) || !empty($x['dono']))) return 'existe';
             $lista = array_values(array_filter($lista, fn($x) => $x['email'] !== $email));
             $u = ['email' => $email, 'nome' => $nome, 'papel' => $papel, 'criado_em' => agora(), 'convidado_por' => $s['nome'], 'ultimoAcesso' => null];
             aplicar_temporaria($u, $senha);
@@ -494,6 +508,7 @@ if (str_starts_with($caminho, '/api/equipe')) {
     if ($metodo === 'POST' && $caminho === '/api/equipe/redefinir') {
         $email = mb_strtolower(texto(ler_corpo(500)['email'] ?? '', 160));
         if ($email === $s['email']) erro(400, 'PROPRIA', 'Para a sua senha, use Trocar minha senha no menu da conta.');
+        if (eh_dono($email)) erro(403, 'DONO', 'A senha do super admin só é trocada por ele mesmo.');
         $senha = senha_temporaria();
         $ok = com_trava(function () use ($email, $senha) {
             $lista = usuarios(); $achou = false;
@@ -516,6 +531,7 @@ if (str_starts_with($caminho, '/api/equipe')) {
         $email = mb_strtolower(texto($c['email'] ?? '', 160));
         $ativo = !empty($c['ativo']);
         if ($email === $s['email']) erro(400, 'PROPRIA', 'Você não pode desativar a própria conta.');
+        if (eh_dono($email)) erro(403, 'DONO', 'O super admin não pode ser desativado.');
         $ok = com_trava(function () use ($email, $ativo) {
             $l = usuarios(); $achou = false;
             foreach ($l as &$x) if ($x['email'] === $email) { $x['ativo'] = $ativo; $achou = true; }

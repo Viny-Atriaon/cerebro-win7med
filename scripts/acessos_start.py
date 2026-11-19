@@ -1,6 +1,8 @@
 """Acesso de administrador com senha temporária no start.win7.ai e o HTML de acessos (ADR-008, adendo de 19/11/2026).
 
-Uso: python -X utf8 scripts/acessos_start.py <email-de-login-do-administrador>
+Uso: python -X utf8 scripts/acessos_start.py <email-de-login-do-administrador> [--super] [--nome "Nome"] [--desativar <outro-email>]
+  --super: super admin (dono do sistema): nenhum outro administrador desativa nem redefine a senha dele.
+  --desativar: tira o acesso de outra conta na mesma publicação (a conta fica, desativada; as sessões caem).
 (o e-mail é só o login; o sistema não envia e-mail. Fica fora do código: o repositório é público, ADR-009)
 - Gera uma senha temporária (12 letras e números sem os que confundem), calcula o hash com o PHP local e envia ao
   servidor só o hash, como usuarios-semente.json (0600, fora da pasta pública). A API absorve na próxima requisição:
@@ -64,8 +66,10 @@ def logo_base64():
     return "data:image/png;base64," + base64.b64encode(arq.read_bytes()).decode() if arq.exists() else ""
 
 
-def montar_html(email, senha, vale_ate):
+def montar_html(email, senha, vale_ate, super_admin=False):
     e, s = html.escape(email), html.escape(senha)
+    papel = "super admin" if super_admin else "administrador"
+    extra = " Como super admin, só você altera a sua conta: nenhum outro administrador desativa nem redefine a sua senha." if super_admin else ""
     return f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -107,10 +111,10 @@ ol b{{color:var(--tinta)}}
 <div class="faixa" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <main>
   <header>{f'<img src="{logo_base64()}" alt="Win7 Med">' if logo_base64() else ''}<div><h1>Acessos do Cérebro</h1></div></header>
-  <p class="sub">O sistema interno da Win7 Med com a Análise, a Execução e os projetos salvos. Este é o acesso de administrador: com ele você entra, cria a sua senha e adiciona as outras pessoas.</p>
+  <p class="sub">O sistema interno da Win7 Med com a Análise, a Execução e os projetos salvos. Este é o seu acesso de {papel}: com ele você entra, cria a sua senha e adiciona as outras pessoas.{extra}</p>
 
   <section class="cartao" aria-labelledby="t-admin">
-    <h2 id="t-admin">Acesso de administrador</h2>
+    <h2 id="t-admin">Acesso de {papel}</h2>
     <dl class="dados">
       <div class="linha"><dt>Endereço</dt><dd id="v-end">https://{DOMINIO}</dd><a class="botao primario" href="https://{DOMINIO}" target="_blank" rel="noopener">Abrir</a></div>
       <div class="linha"><dt>E-mail</dt><dd id="v-email">{e}</dd><button type="button" data-copiar="v-email">Copiar</button></div>
@@ -130,7 +134,7 @@ ol b{{color:var(--tinta)}}
     </ol>
   </section>
 
-  <p class="aviso"><b>Este arquivo tem senha.</b> Ele fica só neste computador, fora do git. Não envie por e-mail aberto nem poste em grupo. Depois que você criar a sua senha, a temporária não vale mais, e pode apagar este arquivo. Perdeu o acesso? Na pasta do Cérebro, rode de novo <code>python -X utf8 scripts/acessos_start.py {e}</code>: sai uma temporária nova.</p>
+  <p class="aviso"><b>Este arquivo tem senha.</b> Ele fica só neste computador, fora do git. Não envie por e-mail aberto nem poste em grupo. Depois que você criar a sua senha, a temporária não vale mais, e pode apagar este arquivo. Perdeu o acesso? Na pasta do Cérebro, rode de novo <code>python -X utf8 scripts/acessos_start.py {e}{' --super' if super_admin else ''}</code>: sai uma temporária nova.</p>
   <p class="rodape">Gerado em {datetime.now():%d/%m/%Y às %H:%M} · Cérebro Win7 Med · uso interno</p>
 </main>
 <script>
@@ -149,13 +153,23 @@ document.querySelectorAll('[data-copiar]').forEach(function (b) {{
 
 
 def main():
-    if len(sys.argv) < 2:
+    args = sys.argv[1:]
+    if not args or args[0].startswith("--"):
         sys.exit(__doc__)
-    email = sys.argv[1].strip().lower()
-    if "@" not in email or "." not in email.split("@")[-1]:
-        sys.exit("E-mail inválido.")
+    valor = lambda chave: args[args.index(chave) + 1] if chave in args and args.index(chave) + 1 < len(args) else None
+    email = args[0].strip().lower()
+    super_admin = "--super" in args
+    nome = (valor("--nome") or ("Super admin" if super_admin else "Administrador")).strip()
+    desativar = (valor("--desativar") or "").strip().lower()
+    for x in filter(None, [email, desativar]):
+        if "@" not in x or "." not in x.split("@")[-1]:
+            sys.exit(f"E-mail inválido: {x}")
+    if desativar == email:
+        sys.exit("O e-mail a desativar é o mesmo do acesso novo.")
     senha = senha_temporaria()
-    semente = [{"email": email, "nome": "Administrador", "papel": "admin", "hash": hash_da(senha)}]
+    semente = [{"email": email, "nome": nome, "papel": "admin", "dono": super_admin, "hash": hash_da(senha)}]
+    if desativar:
+        semente.append({"email": desativar, "desativar": True})
     with tempfile.TemporaryDirectory() as tmp:
         arq = Path(tmp) / "usuarios-semente.json"
         arq.write_text(json.dumps(semente), encoding="utf-8")
@@ -178,8 +192,10 @@ def main():
         sys.exit("A conta foi enviada, mas o servidor ainda não absorveu. Abra https://start.win7.ai e rode de novo se não entrar.")
     vale_ate = (datetime.now() + timedelta(days=7)).strftime("%d/%m/%Y às %H:%M")
     SAIDA.parent.mkdir(exist_ok=True)
-    SAIDA.write_text(montar_html(email, senha, vale_ate), encoding="utf-8")
-    print(f"✅ acesso de administrador {email} pronto no servidor (senha temporária, troca obrigatória no 1º acesso, vale até {vale_ate})")
+    SAIDA.write_text(montar_html(email, senha, vale_ate, super_admin), encoding="utf-8")
+    print(f"✅ acesso de {'super admin' if super_admin else 'administrador'} {email} pronto no servidor (senha temporária, troca obrigatória no 1º acesso, vale até {vale_ate})")
+    if desativar:
+        print(f"🔒 acesso de {desativar} desativado")
     print(f"📄 abra {SAIDA} (a senha não é impressa aqui)")
 
 
