@@ -216,5 +216,65 @@ try {
   await inst2.parar();
 }
 
+// ---------------------------------------------------------------- senha temporária (19/11): conta semeada pela publicação, troca obrigatória
+const inst3 = await subirInstancia();
+try {
+  const php = comandoPhp();
+  const hashDe = (senha) => spawnSync(php.exe, [...php.args, '-r', "echo password_hash(getenv('W7_S'), PASSWORD_DEFAULT);"], { env: { ...process.env, W7_S: senha }, encoding: 'utf8', windowsHide: true }).stdout.trim();
+  const temp = 'Abcd-Efgh-Jk23';
+  fs.writeFileSync(path.join(inst3.dados, 'usuarios-semente.json'), JSON.stringify([{ email: 'Admin@Teste.Local', nome: 'Administrador', papel: 'admin', hash: hashDe(temp) }]));
+  const R = async (metodo, rota, corpo, cookie = '') => {
+    const r = await fetch(inst3.base + '/api/' + rota, { method: metodo, headers: { 'X-Start': '1', ...(corpo ? { 'Content-Type': 'application/json' } : {}), ...(cookie ? { Cookie: cookie } : {}) }, body: corpo ? JSON.stringify(corpo) : undefined });
+    const t = await r.text(); let j = null; try { j = JSON.parse(t); } catch { j = null; }
+    return { status: r.status, j, cookie: (r.headers.get('set-cookie') || '').split(';')[0] };
+  };
+  const l1 = await R('POST', 'entrar', { email: 'admin@teste.local', senha: temp });
+  check(l1.status === 200 && l1.j.trocar_senha === true && l1.j.papel === 'admin', 'conta semeada pela publicação entra com a senha temporária e vem marcada para trocar');
+  const usu = fs.readFileSync(path.join(inst3.dados, 'usuarios.json'), 'utf8');
+  check(!fs.existsSync(path.join(inst3.dados, 'usuarios-semente.json')) && !usu.includes(temp), 'semente absorvida e apagada; a senha temporária não fica guardada, só o hash');
+  const ck = l1.cookie;
+  check((await R('GET', 'projetos', null, ck)).j?.erro?.codigo === 'TROCAR_SENHA' && (await R('POST', 'pastas', { nome: 'x' }, ck)).status === 403, 'com a senha temporária, nada além de trocar a senha (403 TROCAR_SENHA)');
+  check((await R('GET', 'sessao', null, ck)).j?.usuario?.trocar_senha === true, 'a sessão avisa a tela que precisa trocar a senha');
+  check((await R('POST', 'senha', { atual: 'errada-errada', nova: 'nova-senha-do-admin' }, ck)).j?.erro?.codigo === 'SENHA_ATUAL', 'troca com a senha atual errada recusada');
+  check((await R('POST', 'senha', { atual: temp, nova: 'curta' }, ck)).status === 400 && (await R('POST', 'senha', { atual: temp, nova: temp }, ck)).status === 400, 'senha nova curta ou igual à temporária recusada');
+  const tr = await R('POST', 'senha', { atual: temp, nova: 'nova-senha-do-admin' }, ck);
+  check(tr.status === 200 && tr.j.trocar_senha === false && (await R('GET', 'projetos', null, ck)).status === 200, 'depois de trocar, a mesma sessão segue e o sistema abre');
+  const espera = () => new Promise((r) => setTimeout(r, 1100));  // a espera progressiva depois de uma senha errada (defesa contra força bruta)
+  const velha = (await R('POST', 'entrar', { email: 'admin@teste.local', senha: temp })).status;
+  await espera();
+  check(velha === 401 && (await R('POST', 'entrar', { email: 'admin@teste.local', senha: 'nova-senha-do-admin' })).status === 200, 'a temporária deixa de valer; a senha nova entra');
+  // o administrador cria uma pessoa já com senha temporária
+  const cu = await R('POST', 'equipe/usuarios', { nome: 'Pessoa Nova', email: 'nova@teste.local', papel: 'equipe' }, ck);
+  check(cu.status === 200 && /^[a-zA-Z2-9]{4}-[a-zA-Z2-9]{4}-[a-zA-Z2-9]{4}$/.test(cu.j.senha_temporaria) && cu.j.expira_em_dias === 7, 'administrador adiciona pessoa com senha temporária (12 caracteres, sem os que confundem, 7 dias)');
+  check((await R('POST', 'equipe/usuarios', { nome: 'Pessoa Nova', email: 'nova@teste.local' }, ck)).status === 409, 'pessoa com conta ativa não é criada de novo');
+  const eqv = await R('GET', 'equipe', null, ck);
+  check(eqv.j.usuarios.find((u) => u.email === 'nova@teste.local')?.trocar_senha === true && eqv.j.usuarios.every((u) => !('hash' in u) && !('temporaria_expira' in u)), 'a equipe mostra quem ainda está com a senha temporária, sem hash');
+  const ln = await R('POST', 'entrar', { email: 'nova@teste.local', senha: cu.j.senha_temporaria });
+  check(ln.status === 200 && ln.j.trocar_senha === true && (await R('POST', 'senha', { atual: cu.j.senha_temporaria, nova: 'senha-da-pessoa-nova' }, ln.cookie)).status === 200, 'a pessoa entra com a temporária e cria a própria senha');
+  // redefinir: senha nova temporária, sessão derrubada
+  const rd = await R('POST', 'equipe/redefinir', { email: 'nova@teste.local' }, ck);
+  check(rd.status === 200 && rd.j.senha_temporaria && (await R('GET', 'eu', null, ln.cookie)).status === 401, 'redefinir senha gera uma temporária nova e derruba as sessões da pessoa');
+  const antiga = (await R('POST', 'entrar', { email: 'nova@teste.local', senha: 'senha-da-pessoa-nova' })).status;
+  await espera();
+  check(antiga === 401 && (await R('POST', 'entrar', { email: 'nova@teste.local', senha: rd.j.senha_temporaria })).j?.trocar_senha === true, 'depois de redefinir, só a temporária nova entra (e pede a troca)');
+  check((await R('POST', 'equipe/redefinir', { email: 'admin@teste.local' }, ck)).status === 400, 'o administrador não redefine a própria senha por ali (usa Trocar minha senha)');
+  const eq2 = (await R('POST', 'entrar', { email: 'nova@teste.local', senha: 'x' })).status;
+  check(eq2 === 401, 'senha errada continua recusada');
+  // temporária vencida
+  const arqU = path.join(inst3.dados, 'usuarios.json');
+  const lista = JSON.parse(fs.readFileSync(arqU, 'utf8'));
+  lista.find((u) => u.email === 'nova@teste.local').temporaria_expira = Date.now() - 1000;
+  fs.writeFileSync(arqU, JSON.stringify(lista));
+  await new Promise((r) => setTimeout(r, 1100));  // a espera progressiva da senha errada de cima
+  check((await R('POST', 'entrar', { email: 'nova@teste.local', senha: rd.j.senha_temporaria })).j?.erro?.codigo === 'TEMPORARIA_VENCIDA', 'senha temporária vencida (7 dias) não entra');
+  check((await R('POST', 'equipe/usuarios', { nome: 'Sem email', email: 'nao-e-email' }, ck)).status === 400, 'pessoa com e-mail inválido recusada');
+  const semPapel = await R('POST', 'equipe/usuarios', { nome: 'Pessoa Comum', email: 'comum@teste.local' }, ck);
+  const lc = await R('POST', 'entrar', { email: 'comum@teste.local', senha: semPapel.j.senha_temporaria });
+  await R('POST', 'senha', { atual: semPapel.j.senha_temporaria, nova: 'senha-da-pessoa-comum' }, lc.cookie);
+  check((await R('POST', 'equipe/usuarios', { nome: 'X', email: 'x@teste.local' }, lc.cookie)).status === 403 && (await R('POST', 'equipe/redefinir', { email: 'nova@teste.local' }, lc.cookie)).status === 403, 'só o administrador cria pessoas e redefine senhas');
+} finally {
+  await inst3.parar();
+}
+
 console.log(`\n${total} checagens da API do start · ${falhas ? falhas + ' falha(s)' : 'regressão ok'}`);
 process.exit(falhas ? 1 : 0);

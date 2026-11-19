@@ -1,10 +1,11 @@
 <?php
 // API do start.win7.ai (ADR-008): projetos salvos (diagnóstico, onboarding e mapeamento) e a equipe que usa o Cérebro.
 // Tudo passa por aqui (/api/*, regra no .htaccess). Conta por pessoa, por convite; sessão por cookie HttpOnly.
-//   /api/saude · /api/sessao · /api/eu · /api/entrar · /api/sair · /api/convite/ver · /api/convite/aceitar
+//   /api/saude · /api/sessao · /api/eu · /api/entrar · /api/sair · /api/senha · /api/convite/ver · /api/convite/aceitar
 //   /api/projetos (lista e salvar diagnóstico) · /api/projetos/<id> · .../onboarding · .../mapa · .../pasta · .../arquivar
 //   /api/pastas (lista e criar) · /api/pastas/<id>/renomear · /api/pastas/<id>/apagar (só vazia)
-//   /api/equipe · /api/equipe/convites · /api/equipe/convites/cancelar · /api/equipe/situacao   (só administrador)
+//   /api/equipe · /api/equipe/convites · /api/equipe/convites/cancelar · /api/equipe/situacao
+//   /api/equipe/usuarios (pessoa com senha temporária) · /api/equipe/redefinir (senha temporária nova)   (só administrador)
 declare(strict_types=1);
 require_once __DIR__ . '/lib/base.php';
 
@@ -32,9 +33,27 @@ if ($metodo !== 'GET') {
 }
 
 // ---------------------------------------------------------------- contas e sessões
+// Senha temporária (pedido do Viny em 19/11): quem recebe entra com ela e o sistema obriga a criar a própria senha antes
+// de qualquer outra coisa. Vale 7 dias. O administrador cria a pessoa já com senha temporária ou redefine a de alguém.
+const DIAS_SENHA_TEMPORARIA = 7;
 function usuarios(): array { return ler_json('usuarios.json', []); }
 function achar_usuario(string $email): ?array { foreach (usuarios() as $u) if ($u['email'] === $email) return $u; return null; }
-function usuario_publico(array $u): array { return ['email' => $u['email'], 'nome' => $u['nome'], 'papel' => $u['papel'], 'ativo' => !empty($u['ativo']), 'criado_em' => $u['criado_em'] ?? null, 'ultimoAcesso' => $u['ultimoAcesso'] ?? null]; }
+function usuario_publico(array $u): array { return ['email' => $u['email'], 'nome' => $u['nome'], 'papel' => $u['papel'], 'ativo' => !empty($u['ativo']), 'criado_em' => $u['criado_em'] ?? null, 'ultimoAcesso' => $u['ultimoAcesso'] ?? null, 'trocar_senha' => !empty($u['trocar_senha'])]; }
+/** 12 letras e números sem os que confundem (0/O, 1/l/I), em 3 grupos: fácil de ditar e de digitar. */
+function senha_temporaria(): string {
+    $a = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    $t = '';
+    for ($i = 0; $i < 12; $i++) $t .= $a[random_int(0, strlen($a) - 1)];
+    return substr($t, 0, 4) . '-' . substr($t, 4, 4) . '-' . substr($t, 8, 4);
+}
+/** Grava a senha temporária (só o hash), obriga a troca e derruba as sessões abertas da pessoa. Chamar dentro da trava. */
+function aplicar_temporaria(array &$u, string $senha): void {
+    $u['hash'] = password_hash($senha, PASSWORD_DEFAULT);
+    $u['trocar_senha'] = true;
+    $u['temporaria_expira'] = agora_ms() + DIAS_SENHA_TEMPORARIA * 86400e3;
+    $u['ativo'] = true;
+    gravar_json('estado/sessoes.json', array_filter(ler_json('estado/sessoes.json', []), fn($x) => $x['email'] !== $u['email']));
+}
 
 /** Convites: só o hash do token fica guardado. O primeiro convite chega pela publicação (convites-semente.json). */
 function convites(): array {
@@ -62,8 +81,9 @@ function sessao(): ?array {
     if (!$s || $s['expira'] < agora_ms()) return null;
     $u = achar_usuario($s['email']);
     if (!$u || empty($u['ativo'])) return null;
-    return ['chave' => $chave, 'email' => $u['email'], 'nome' => $u['nome'], 'papel' => $u['papel']];
+    return ['chave' => $chave, 'email' => $u['email'], 'nome' => $u['nome'], 'papel' => $u['papel'], 'trocar_senha' => !empty($u['trocar_senha'])];
 }
+function usuario_da_resposta(array $u): array { return ['nome' => $u['nome'], 'papel' => $u['papel'], 'email' => $u['email'], 'trocar_senha' => !empty($u['trocar_senha'])]; }
 function criar_sessao(array $u): string {
     $token = bin2hex(random_bytes(24));
     com_trava(function () use ($token, $u) {
@@ -123,6 +143,24 @@ function anotar(array &$p, array $s, string $acao, bool $agrupar = false): void 
     $p['atualizado_em'] = agora(); $p['atualizado_por'] = $s['nome'];
 }
 
+// conta semeada pela publicação (--admin-temporario): troca a conta de mesmo e-mail e obriga a criar a senha no 1º acesso
+if (is_file(caminho('usuarios-semente.json'))) com_trava(function () {
+    $semente = ler_json('usuarios-semente.json', []);
+    @unlink(caminho('usuarios-semente.json'));
+    if (!is_array($semente)) return;
+    $lista = usuarios();
+    foreach ($semente as $n) {
+        if (!is_array($n) || !filter_var($n['email'] ?? '', FILTER_VALIDATE_EMAIL) || !preg_match('/^\$2y\$/', (string) ($n['hash'] ?? ''))) continue;
+        $email = mb_strtolower($n['email']);
+        $lista = array_values(array_filter($lista, fn($x) => $x['email'] !== $email));
+        $lista[] = ['email' => $email, 'nome' => texto($n['nome'] ?? 'Administrador', 80), 'papel' => ($n['papel'] ?? '') === 'equipe' ? 'equipe' : 'admin', 'hash' => $n['hash'], 'ativo' => true,
+            'trocar_senha' => true, 'temporaria_expira' => agora_ms() + DIAS_SENHA_TEMPORARIA * 86400e3, 'criado_em' => agora(), 'convidado_por' => 'publicação', 'ultimoAcesso' => null];
+        gravar_json('estado/sessoes.json', array_filter(ler_json('estado/sessoes.json', []), fn($x) => $x['email'] !== $email));
+        registrar('info', 'conta_semeada', ['email' => $email]);
+    }
+    gravar_json('usuarios.json', $lista);
+});
+
 // ---------------------------------------------------------------- rotas abertas
 if ($metodo === 'GET' && $caminho === '/api/saude') {
     $ok = @file_put_contents(caminho('.saude'), agora()) !== false;
@@ -157,8 +195,9 @@ if ($metodo === 'POST' && $caminho === '/api/entrar') {
     }
     com_trava(function () use ($chaveEspera) { $es = ler_json('estado/esperas.json', []); unset($es[$chaveEspera]); gravar_json('estado/esperas.json', $es); });
     devolver($chaveIp); devolver($chaveConta);
+    if (!empty($u['trocar_senha']) && ($u['temporaria_expira'] ?? 0) < agora_ms()) erro(401, 'TEMPORARIA_VENCIDA', 'A senha temporária venceu. Peça outra ao administrador.');
     if (password_needs_rehash($u['hash'], PASSWORD_DEFAULT)) com_trava(function () use ($u, $c) { $l = usuarios(); foreach ($l as &$x) if ($x['email'] === $u['email']) $x['hash'] = password_hash((string) $c['senha'], PASSWORD_DEFAULT); unset($x); gravar_json('usuarios.json', $l); });
-    enviar(200, ['nome' => $u['nome'], 'papel' => $u['papel'], 'email' => $u['email']], ['Set-Cookie' => criar_sessao($u)]);
+    enviar(200, usuario_da_resposta($u), ['Set-Cookie' => criar_sessao($u)]);
 }
 
 if ($metodo === 'POST' && $caminho === '/api/convite/ver') {
@@ -212,9 +251,42 @@ if ($metodo === 'POST' && $caminho === '/api/sair') {
     enviar(200, ['ok' => true], ['Set-Cookie' => NOME_COOKIE . '=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0']);
 }
 // a tela do start pergunta na abertura se já há sessão: resposta 200 nos dois casos (sem erro no console do navegador)
-if ($metodo === 'GET' && $caminho === '/api/sessao') enviar(200, ['usuario' => $s ? ['nome' => $s['nome'], 'email' => $s['email'], 'papel' => $s['papel']] : null]);
+if ($metodo === 'GET' && $caminho === '/api/sessao') enviar(200, ['usuario' => $s ? usuario_da_resposta($s) : null]);
 if (!$s) erro(401, 'SEM_SESSAO', 'Entre para continuar.');
-if ($metodo === 'GET' && $caminho === '/api/eu') enviar(200, ['nome' => $s['nome'], 'email' => $s['email'], 'papel' => $s['papel']]);
+if ($metodo === 'GET' && $caminho === '/api/eu') enviar(200, usuario_da_resposta($s));
+
+// trocar a própria senha: obrigatório depois da temporária, e a qualquer hora pelo menu da conta
+if ($metodo === 'POST' && $caminho === '/api/senha') {
+    if (!cabe('senha:' . $s['email'], 10, 900000)) erro(429, 'LIMITE', 'Muitas tentativas. Espere 15 minutos.');
+    $c = ler_corpo(2000);
+    $atual = (string) ($c['atual'] ?? ''); $nova = (string) ($c['nova'] ?? '');
+    if (!senha_valida($nova)) erro(400, 'SENHA', 'A senha nova precisa ter pelo menos 10 caracteres.');
+    if ($nova === $atual) erro(400, 'SENHA', 'A senha nova precisa ser diferente da atual.');
+    $r = com_trava(function () use ($s, $atual, $nova) {
+        $lista = usuarios();
+        foreach ($lista as &$x) {
+            if ($x['email'] !== $s['email']) continue;
+            if (!password_verify($atual, $x['hash'])) return 'errada';
+            $x['hash'] = password_hash($nova, PASSWORD_DEFAULT);
+            unset($x['trocar_senha'], $x['temporaria_expira']);
+            $x['senha_trocada_em'] = agora();
+            // as outras sessões da pessoa caem; esta continua
+            gravar_json('estado/sessoes.json', array_filter(ler_json('estado/sessoes.json', []), fn($v, $k) => $v['email'] !== $s['email'] || $k === $s['chave'], ARRAY_FILTER_USE_BOTH));
+            $u = $x;
+            unset($x);
+            gravar_json('usuarios.json', $lista);
+            return $u;
+        }
+        return 'sumiu';
+    });
+    if ($r === 'errada') erro(400, 'SENHA_ATUAL', 'A senha atual não confere.');
+    if (!is_array($r)) erro(404, 'CONTA', 'Conta não encontrada.');
+    devolver('senha:' . $s['email']);
+    registrar('info', 'senha_trocada', ['email' => $s['email']]);
+    enviar(200, usuario_da_resposta($r));
+}
+// com a senha temporária, nada além de sair e trocar a senha
+if (!empty($s['trocar_senha']) && $caminho !== '/api/sair') erro(403, 'TROCAR_SENHA', 'Crie a sua senha para continuar.');
 
 // lista de projetos (o mais recente primeiro); os arquivados vêm com ?arquivados=1
 if ($metodo === 'GET' && $caminho === '/api/projetos') {
@@ -395,6 +467,44 @@ if (str_starts_with($caminho, '/api/equipe')) {
         $host = preg_replace('/[^a-z0-9.:-]/i', '', (string) ($_SERVER['HTTP_HOST'] ?? 'start.win7.ai'));
         registrar('info', 'convite_criado', ['para' => $email, 'por' => $s['email']]);
         enviar(200, ['link' => (eh_https() ? 'https' : 'http') . '://' . $host . '/#convite=' . $token, 'expira_em_dias' => 7]);
+    }
+    if ($metodo === 'POST' && $caminho === '/api/equipe/usuarios') {
+        $c = ler_corpo(2000);
+        $email = mb_strtolower(texto($c['email'] ?? '', 160));
+        $nome = texto($c['nome'] ?? '', 80);
+        $papel = ($c['papel'] ?? '') === 'admin' ? 'admin' : 'equipe';
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) erro(400, 'EMAIL', 'E-mail inválido.');
+        if ($nome === '') erro(400, 'NOME', 'Informe o nome da pessoa.');
+        $senha = senha_temporaria();
+        $r = com_trava(function () use ($email, $nome, $papel, $senha, $s) {
+            $lista = usuarios();
+            foreach ($lista as $x) if ($x['email'] === $email && !empty($x['ativo'])) return 'existe';
+            $lista = array_values(array_filter($lista, fn($x) => $x['email'] !== $email));
+            $u = ['email' => $email, 'nome' => $nome, 'papel' => $papel, 'criado_em' => agora(), 'convidado_por' => $s['nome'], 'ultimoAcesso' => null];
+            aplicar_temporaria($u, $senha);
+            $lista[] = $u;
+            gravar_json('usuarios.json', $lista);
+            gravar_json('convites.json', array_filter(ler_json('convites.json', []), fn($x) => $x['email'] !== $email));
+            return 'ok';
+        });
+        if ($r === 'existe') erro(409, 'CONTA', 'Essa pessoa já tem conta ativa. Para uma senha nova, use Redefinir senha.');
+        registrar('info', 'conta_criada_temporaria', ['para' => $email, 'por' => $s['email']]);
+        enviar(200, ['email' => $email, 'senha_temporaria' => $senha, 'expira_em_dias' => DIAS_SENHA_TEMPORARIA]);
+    }
+    if ($metodo === 'POST' && $caminho === '/api/equipe/redefinir') {
+        $email = mb_strtolower(texto(ler_corpo(500)['email'] ?? '', 160));
+        if ($email === $s['email']) erro(400, 'PROPRIA', 'Para a sua senha, use Trocar minha senha no menu da conta.');
+        $senha = senha_temporaria();
+        $ok = com_trava(function () use ($email, $senha) {
+            $lista = usuarios(); $achou = false;
+            foreach ($lista as &$x) if ($x['email'] === $email) { aplicar_temporaria($x, $senha); $achou = true; }
+            unset($x);
+            if ($achou) gravar_json('usuarios.json', $lista);
+            return $achou;
+        });
+        if (!$ok) erro(404, 'CONTA', 'Conta não encontrada.');
+        registrar('info', 'senha_redefinida', ['para' => $email, 'por' => $s['email']]);
+        enviar(200, ['email' => $email, 'senha_temporaria' => $senha, 'expira_em_dias' => DIAS_SENHA_TEMPORARIA]);
     }
     if ($metodo === 'POST' && $caminho === '/api/equipe/convites/cancelar') {
         $email = mb_strtolower(texto(ler_corpo(500)['email'] ?? '', 160));

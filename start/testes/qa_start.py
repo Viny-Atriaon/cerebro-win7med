@@ -9,6 +9,7 @@ Código de saída 1 se alguma etapa falhar.
 """
 import hashlib
 import json
+import re
 import os
 import secrets
 import shutil
@@ -225,6 +226,7 @@ def main() -> int:
             pg.goto(base + "/#equipe")
             pg.wait_for_selector(".pessoa")
             pg.fill("#cv-nome", "Pessoa da Equipe"); pg.fill("#cv-email", "pessoa@teste.local")
+            pg.check('input[name="modo-acesso"][value="convite"]')
             pg.click("#form-convite button[type=submit]")
             pg.wait_for_selector("#link-convite:not([hidden])")
             pg.wait_for_timeout(450)
@@ -317,6 +319,57 @@ def main() -> int:
             pg3.click("#conta-botao"); pg3.click("#sair")
             pg3.wait_for_selector("#porta-entrar:not([hidden])")
             ctx3.close()
+
+            # ---------------- 4. acesso de administrador com senha temporária (scripts/acessos_start.py), 19/11
+            temp = "Qwer-Tyu2-Asdf"
+            h = subprocess.run([*comando_php(), "-r", "echo password_hash(getenv('W7_S'), PASSWORD_DEFAULT);"], env={**os.environ, "W7_S": temp},
+                               capture_output=True, text=True, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout.strip()
+            (dados / "usuarios-semente.json").write_text(json.dumps([{"email": "temp-admin@teste.local", "nome": "Administrador", "papel": "admin", "hash": h}]), encoding="utf-8")
+            for largura, altura, rot in [(1440, 900, "pc"), (375, 812, "cel")]:
+                ctx4 = nav.new_context(viewport={"width": largura, "height": altura})
+                pg4 = ctx4.new_page()
+                pg4.on("pageerror", lambda e: erros.append(str(e)))
+                pg4.goto(base + "/")
+                pg4.wait_for_selector("#porta-entrar:not([hidden])")
+                pg4.fill("#en-email", "temp-admin@teste.local"); pg4.fill("#en-senha", temp if rot == "pc" else "senha-do-admin-nova")
+                pg4.click("#form-entrar button[type=submit]")
+                if rot == "pc":
+                    pg4.wait_for_selector("#porta-senha:not([hidden])")
+                    if pg4.is_visible("#abas"):
+                        falhas.append("pc: com a senha temporária, as abas apareceram antes de criar a senha")
+                    pg4.wait_for_timeout(450)
+                    pg4.screenshot(path=str(pasta / "start-pc-09-criar-senha.png"))
+                    pg4.fill("#se-atual", temp); pg4.fill("#se-nova", "senha-do-admin-nova"); pg4.fill("#se-nova2", "senha-do-admin-nova")
+                    pg4.click("#se-enviar")
+                pg4.wait_for_selector("#abas:not([hidden])")
+                pg4.goto(base + "/#equipe")
+                pg4.wait_for_selector(".pessoa")
+                pg4.fill("#cv-nome", "Pessoa Temporária " + rot); pg4.fill("#cv-email", f"temp-{rot}@teste.local")
+                pg4.click("#cv-enviar")
+                pg4.wait_for_selector("#credencial:not([hidden])")
+                senha_p = pg4.inner_text("#cred-senha")
+                if not re.fullmatch(r"[a-zA-Z2-9]{4}-[a-zA-Z2-9]{4}-[a-zA-Z2-9]{4}", senha_p):
+                    falhas.append(f"{rot}: a senha temporária da pessoa nova não apareceu ({senha_p!r})")
+                if "senha temporária" not in pg4.inner_text("#lista-pessoas"):
+                    falhas.append(f"{rot}: a lista não marca quem está com a senha temporária")
+                botao = pg4.locator(f'[data-redefinir="temp-{rot}@teste.local"]')
+                botao.click(); botao.click()
+                pg4.wait_for_timeout(900)
+                if pg4.inner_text("#cred-senha") == senha_p or "Senha temporária nova" not in pg4.inner_text("#credencial"):
+                    falhas.append(f"{rot}: Redefinir senha não gerou uma temporária nova")
+                sem_rolagem(pg4, rot, falhas, "equipe com a credencial")
+                pg4.locator("#credencial").scroll_into_view_if_needed()
+                pg4.wait_for_timeout(450)
+                pg4.screenshot(path=str(pasta / f"start-{rot}-10-equipe-temporaria.png"), full_page=(rot == "cel"))
+                if rot == "cel":
+                    pg4.click("#conta-botao"); pg4.click("#menu-senha")
+                    pg4.wait_for_selector("#porta-senha:not([hidden])")
+                    if pg4.is_hidden("#se-cancelar") or "Trocar minha senha" not in pg4.inner_text("#porta-senha"):
+                        falhas.append("cel: Trocar minha senha não abriu o formulário certo")
+                    sem_rolagem(pg4, rot, falhas, "trocar senha")
+                    pg4.wait_for_timeout(450)
+                    pg4.screenshot(path=str(pasta / "start-cel-11-trocar-senha.png"))
+                ctx4.close()
             nav.close()
     finally:
         proc.terminate()

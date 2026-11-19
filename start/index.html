@@ -186,6 +186,18 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
 .grade-equipe{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:18px;align-items:start}
 .cartao form{display:grid;gap:14px}
 .link-convite{display:grid;gap:10px}
+.modo-acesso{display:grid;gap:8px;border:0}
+.modo-acesso legend{font-size:13.5px;font-weight:700;color:var(--texto);margin-bottom:6px}
+.modo-acesso label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--linha-forte);border-radius:12px;cursor:pointer;font-size:14px;color:var(--texto)}
+.modo-acesso label:has(input:checked){border-color:var(--petroleo);background:var(--petroleo-leve)}
+.modo-acesso input{margin-top:3px;width:17px;height:17px;accent-color:var(--petroleo);flex:none}
+.modo-acesso b{display:block;color:var(--tinta)}
+.credencial{display:grid;gap:10px;padding:14px;border-radius:14px;background:var(--petroleo-leve);border:1px solid var(--linha)}
+.credencial dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;align-items:center}
+.credencial dt{font-size:13px;font-weight:700;color:var(--texto)}
+.credencial dd{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:15px;font-weight:700;overflow-wrap:anywhere;user-select:all}
+.credencial .acoes-cred{display:flex;flex-wrap:wrap;gap:8px}
+.pessoa .botoes{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
 .link-convite code{display:block;padding:12px 14px;border-radius:12px;background:var(--fundo);font-size:13px;overflow-wrap:anywhere;user-select:all}
 .pessoas{display:grid;gap:0}
 .pessoa{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--linha)}
@@ -193,7 +205,7 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
 .pessoa .nome{display:grid;gap:1px;min-width:0}
 .pessoa .nome b{overflow-wrap:anywhere}
 .pessoa .nome span{font-size:13px;color:var(--apagado);overflow-wrap:anywhere}
-.selo{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;background:var(--petroleo-leve);color:var(--petroleo);margin-left:6px;vertical-align:1px}
+.selo{display:inline-block;white-space:nowrap;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700;background:var(--petroleo-leve);color:var(--petroleo);margin-left:6px;vertical-align:1px}
 .selo.off{background:#fdecec;color:var(--vermelho-escuro)}
 .selo.pend{background:#fff4d6;color:#7a5600}
 .cartao h3{font-size:1.1rem}
@@ -235,6 +247,10 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
   .cartao{padding:20px}
   .projeto{grid-template-columns:1fr;padding:16px}
   .porta{padding:26px 20px}
+  .pessoa{grid-template-columns:1fr}
+  .pessoa .botoes{justify-content:flex-start}
+  .credencial dl{grid-template-columns:1fr;gap:2px}
+  .credencial dd{margin-bottom:8px}
 }
 @media (max-width:380px){
   .aba .n{display:none}
@@ -255,7 +271,8 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     <button type="button" id="conta-botao" aria-expanded="false" aria-haspopup="true" aria-controls="conta-menu" aria-label="Sua conta"></button>
     <div class="menu" id="conta-menu" hidden>
       <div class="quem"><b id="conta-nome"></b><span id="conta-email"></span></div>
-      <a href="#equipe" id="menu-equipe" hidden>Equipe e convites</a>
+      <a href="#equipe" id="menu-equipe" hidden>Equipe e acessos</a>
+      <button type="button" id="menu-senha">Trocar minha senha</button>
       <button type="button" id="sair">Sair</button>
     </div>
   </div>
@@ -334,17 +351,27 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     <div class="envolve">
       <div class="abre menor">
         <h1 id="t-equipe">Equipe</h1>
-        <p>Quem acessa o Cérebro. Cada pessoa entra com a própria conta, criada por um convite.</p>
+        <p>Quem acessa o Cérebro. Cada pessoa tem a própria conta: você passa uma senha temporária (ou um link de convite) e, no primeiro acesso, ela cria a senha dela.</p>
       </div>
       <div class="grade-equipe">
         <div class="cartao">
-          <h3>Convidar pessoa</h3>
+          <h3>Adicionar pessoa</h3>
           <form id="form-convite" novalidate>
             <div class="campo"><label for="cv-nome">Nome</label><input id="cv-nome" required maxlength="80" autocomplete="off"></div>
             <div class="campo"><label for="cv-email">E-mail</label><input id="cv-email" type="email" required maxlength="160" autocomplete="off"></div>
             <div class="campo"><label for="cv-papel">Acesso</label><select id="cv-papel"><option value="equipe">Equipe: projetos e sistemas</option><option value="admin">Administrador: também equipe e arquivar</option></select></div>
-            <button class="btn primario" type="submit">Gerar link de convite</button>
+            <fieldset class="modo-acesso">
+              <legend>Como a pessoa vai entrar</legend>
+              <label><input type="radio" name="modo-acesso" value="temporaria" checked><span><b>Senha temporária</b>Você passa o e-mail e a senha; no primeiro acesso ela cria a dela. Vale 7 dias.</span></label>
+              <label><input type="radio" name="modo-acesso" value="convite"><span><b>Link de convite</b>Ela abre o link e cria a senha. Vale 7 dias, uma vez.</span></label>
+            </fieldset>
+            <button class="btn primario" type="submit" id="cv-enviar">Criar acesso</button>
           </form>
+          <div class="credencial" id="credencial" hidden>
+            <p class="ajuda" id="credencial-titulo">Passe estes dados para a pessoa. A senha aparece só agora.</p>
+            <dl><dt>Endereço</dt><dd>https://start.win7.ai</dd><dt>E-mail</dt><dd id="cred-email"></dd><dt>Senha temporária</dt><dd id="cred-senha"></dd></dl>
+            <div class="acoes-cred"><button class="btn" type="button" id="copiar-credencial">Copiar tudo</button><button class="btn" type="button" id="fechar-credencial">Já passei, esconder</button></div>
+          </div>
           <p class="aviso" id="msg-convite" role="status" hidden></p>
           <div class="link-convite" id="link-convite" hidden>
             <p class="ajuda">Envie este link à pessoa pelo WhatsApp ou e-mail. Ele vale 7 dias e funciona uma vez: ela mesma cria a senha.</p>
@@ -379,7 +406,21 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
       <p class="aviso erro" id="msg-entrar" role="alert" hidden></p>
       <button class="btn primario" type="submit">Entrar</button>
     </form>
-    <p class="ajuda">Acesso por convite. Peça o seu a quem administra o Cérebro.</p>
+    <p class="ajuda">Sem acesso? Peça a quem administra o Cérebro: ele cria o seu com uma senha temporária.</p>
+  </div>
+  <div class="porta" id="porta-senha" hidden>
+    <img class="logo-porta" alt="Win7 Med">
+    <div><h1 id="senha-titulo">Crie a sua senha</h1><p id="senha-texto">Você entrou com uma senha temporária. Para continuar, crie a sua: a temporária deixa de valer.</p></div>
+    <form id="form-senha" novalidate>
+      <input type="email" id="se-usuario" autocomplete="username" hidden>
+      <div class="campo"><label for="se-atual" id="se-atual-rotulo">Senha temporária</label><input id="se-atual" type="password" autocomplete="current-password" required maxlength="200"></div>
+      <div class="campo"><label for="se-nova">Senha nova</label><input id="se-nova" type="password" autocomplete="new-password" required minlength="10" maxlength="200" aria-describedby="se-ajuda"><span class="ajuda" id="se-ajuda">Pelo menos 10 caracteres. Uma frase curta é mais fácil de lembrar.</span></div>
+      <div class="campo"><label for="se-nova2">Repita a senha nova</label><input id="se-nova2" type="password" autocomplete="new-password" required maxlength="200"></div>
+      <p class="aviso erro" id="msg-senha" role="alert" hidden></p>
+      <button class="btn primario" type="submit" id="se-enviar">Criar senha e entrar</button>
+      <button class="btn" type="button" id="se-cancelar" hidden>Cancelar</button>
+      <button class="btn" type="button" id="se-sair">Sair</button>
+    </form>
   </div>
   <div class="porta" id="porta-convite" hidden>
     <img class="logo-porta" alt="Win7 Med">
@@ -431,12 +472,24 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
   // ---------------------------------------------------------------- portão: entrar, convite, sessão
   function porta(qual) {
     $('portao').hidden = !qual;
-    ['carregando', 'entrar', 'convite'].forEach(function (k) { $('porta-' + k).hidden = k !== qual; });
-    var campo = qual === 'entrar' ? $('en-email').value ? $('en-senha') : $('en-email') : qual === 'convite' ? $('ac-nome') : null;
+    ['carregando', 'entrar', 'convite', 'senha'].forEach(function (k) { $('porta-' + k).hidden = k !== qual; });
+    var campo = qual === 'entrar' ? $('en-email').value ? $('en-senha') : $('en-email') : qual === 'convite' ? $('ac-nome') : qual === 'senha' ? $('se-atual') : null;
     if (campo) setTimeout(function () { campo.focus(); }, 60);
+  }
+  /** Criar a senha (obrigatório depois da temporária) ou trocar pelo menu da conta. */
+  function pedirSenha(obrigatoria) {
+    $('senha-titulo').textContent = obrigatoria ? 'Crie a sua senha' : 'Trocar minha senha';
+    $('senha-texto').textContent = obrigatoria ? 'Você entrou com uma senha temporária. Para continuar, crie a sua: a temporária deixa de valer.' : 'Digite a senha atual e a nova. As outras sessões abertas com a sua conta são encerradas.';
+    $('se-atual-rotulo').textContent = obrigatoria ? 'Senha temporária' : 'Senha atual';
+    $('se-enviar').textContent = obrigatoria ? 'Criar senha e entrar' : 'Trocar senha';
+    $('se-cancelar').hidden = obrigatoria; $('se-sair').hidden = !obrigatoria;
+    $('se-usuario').value = eu ? eu.email : '';
+    $('se-atual').value = $('se-nova').value = $('se-nova2').value = ''; aviso('msg-senha', '');
+    porta('senha');
   }
   function entrou(u) {
     eu = u;
+    if (u.trocar_senha) { $('abas').hidden = true; $('conta').hidden = true; pedirSenha(true); return; }
     $('conta-botao').textContent = iniciais(u.nome);
     $('conta-nome').textContent = u.nome; $('conta-email').textContent = u.email + (u.papel === 'admin' ? ' · administrador' : '');
     $('menu-equipe').hidden = u.papel !== 'admin';
@@ -458,6 +511,24 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     });
   }
   $('tentar').addEventListener('click', conferir);
+  $('form-senha').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var atual = $('se-atual').value, n1 = $('se-nova').value, n2 = $('se-nova2').value, b = $('se-enviar');
+    if (!atual) { aviso('msg-senha', 'Digite a senha ' + ($('se-cancelar').hidden ? 'temporária' : 'atual') + '.', 'erro'); return; }
+    if (n1.length < 10) { aviso('msg-senha', 'A senha nova precisa ter pelo menos 10 caracteres.', 'erro'); return; }
+    if (n1 !== n2) { aviso('msg-senha', 'As duas senhas novas não são iguais.', 'erro'); return; }
+    if (n1 === atual) { aviso('msg-senha', 'A senha nova precisa ser diferente da atual.', 'erro'); return; }
+    b.disabled = true;
+    api('POST', 'senha', { atual: atual, nova: n1 }).then(function (u) {
+      b.disabled = false; $('se-atual').value = $('se-nova').value = $('se-nova2').value = '';
+      var voluntaria = !$('se-cancelar').hidden;
+      entrou(u);
+      if (voluntaria) { aviso('msg-projetos', 'Senha trocada.', 'ok'); }
+    }, function (er) { b.disabled = false; aviso('msg-senha', er.message, 'erro'); });
+  });
+  $('se-cancelar').addEventListener('click', function () { porta(null); });
+  $('se-sair').addEventListener('click', function () { $('sair').click(); });
+  $('menu-senha').addEventListener('click', function () { menu(false); pedirSenha(false); });
   $('form-entrar').addEventListener('submit', function (e) {
     e.preventDefault();
     var email = $('en-email').value.trim(), senha = $('en-senha').value, b = e.target.querySelector('button');
@@ -506,7 +577,7 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
       eu = null; projetos = [];
       // quem entrar depois começa limpo: os sistemas abertos são descarregados
       document.querySelectorAll('iframe[data-src]').forEach(function (f) { f.removeAttribute('src'); });
-      $('abas').hidden = true; $('conta').hidden = true; $('lista-projetos').innerHTML = '';
+      $('abas').hidden = true; $('conta').hidden = true; $('lista-projetos').innerHTML = ''; $('credencial').hidden = true; $('cred-senha').textContent = '';
       try { history.replaceState(null, '', location.pathname + '#inicio'); } catch (x) { /* fica */ }
       aviso('msg-entrar', ''); porta('entrar');
     });
@@ -725,19 +796,35 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     api('GET', 'equipe').then(function (r) {
       $('lista-pessoas').innerHTML = (r.usuarios || []).map(function (u) {
         var euMesmo = eu && u.email === eu.email;
-        return '<div class="pessoa"><div class="nome"><b>' + esc(u.nome) + (u.papel === 'admin' ? '<span class="selo">administrador</span>' : '') + (u.ativo ? '' : '<span class="selo off">desativada</span>') + '</b>' +
+        return '<div class="pessoa"><div class="nome"><b>' + esc(u.nome) + (u.papel === 'admin' ? '<span class="selo">administrador</span>' : '') + (u.ativo ? '' : '<span class="selo off">desativada</span>') + (u.trocar_senha && u.ativo ? '<span class="selo pend">senha temporária</span>' : '') + '</b>' +
           '<span>' + esc(u.email) + (u.ultimoAcesso ? ' · último acesso ' + esc(quando(u.ultimoAcesso)) : ' · ainda não entrou') + '</span></div>' +
-          (euMesmo ? '<span class="ajuda">você</span>' : '<button class="btn pequeno' + (u.ativo ? ' perigo' : '') + '" type="button" data-email="' + esc(u.email) + '" data-ativo="' + (u.ativo ? '0' : '1') + '">' + (u.ativo ? 'Desativar' : 'Reativar') + '</button>') + '</div>';
+          (euMesmo ? '<span class="ajuda">você</span>' : '<div class="botoes"><button class="btn pequeno" type="button" data-redefinir="' + esc(u.email) + '" data-nome="' + esc(u.nome) + '">Redefinir senha</button>' +
+            '<button class="btn pequeno' + (u.ativo ? ' perigo' : '') + '" type="button" data-email="' + esc(u.email) + '" data-ativo="' + (u.ativo ? '0' : '1') + '">' + (u.ativo ? 'Desativar' : 'Reativar') + '</button></div>') + '</div>';
       }).join('');
       var pend = r.convites || [];
       $('t-pendentes').hidden = !pend.length;
       $('lista-convites').innerHTML = pend.map(function (c) {
         return '<div class="pessoa"><div class="nome"><b>' + esc(c.nome) + '<span class="selo pend">convite</span></b><span>' + esc(c.email || 'e-mail a definir por quem aceitar') + ' · vence em ' + esc(quando(new Date(c.expira).toISOString())) + '</span></div>' +
-          '<button class="btn pequeno" type="button" data-cancelar="' + esc(c.email) + '"' + (c.email ? '' : ' hidden') + '>Cancelar</button></div>';
+          '<button class="btn pequeno" type="button" data-cancelar="' + esc(c.email) + '">Cancelar</button></div>';
       }).join('');
     }, function (e) { $('lista-pessoas').innerHTML = '<p class="aviso erro">' + esc(e.message) + '</p>'; });
   }
+  function mostrarCredencial(titulo, email, senha) {
+    $('credencial-titulo').textContent = titulo;
+    $('cred-email').textContent = email; $('cred-senha').textContent = senha; $('credencial').hidden = false;
+    $('credencial').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
   $('lista-pessoas').addEventListener('click', function (e) {
+    var r = e.target.closest('button[data-redefinir]');
+    if (r) {
+      if (r.getAttribute('data-confirmar') !== '1') { r.setAttribute('data-confirmar', '1'); r.textContent = 'Confirmar: senha nova'; setTimeout(function () { if (r.isConnected) { r.removeAttribute('data-confirmar'); r.textContent = 'Redefinir senha'; } }, 4000); return; }
+      r.disabled = true;
+      api('POST', 'equipe/redefinir', { email: r.getAttribute('data-redefinir') }).then(function (x) {
+        mostrarCredencial('Senha temporária nova de ' + r.getAttribute('data-nome') + '. A senha antiga deixou de valer e as sessões dela foram encerradas. A temporária aparece só agora.', x.email, x.senha_temporaria);
+        aviso('msg-convite', ''); carregarEquipe();
+      }, function (er) { r.disabled = false; alertaEquipe(er.message); });
+      return;
+    }
     var b = e.target.closest('button[data-email]'); if (!b) return;
     b.disabled = true;
     api('POST', 'equipe/situacao', { email: b.getAttribute('data-email'), ativo: b.getAttribute('data-ativo') === '1' }).then(carregarEquipe, function (er) { b.disabled = false; alertaEquipe(er.message); });
@@ -752,13 +839,29 @@ a.cartao:hover .ir{background:var(--petroleo-fundo)}
     e.preventDefault();
     var nome = $('cv-nome').value.trim(), email = $('cv-email').value.trim(), b = e.target.querySelector('button');
     if (!nome || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { aviso('msg-convite', 'Preencha o nome e um e-mail válido.', 'erro'); return; }
-    b.disabled = true; aviso('msg-convite', ''); $('link-convite').hidden = true;
+    b.disabled = true; aviso('msg-convite', ''); $('link-convite').hidden = true; $('credencial').hidden = true;
+    var modo = (document.querySelector('input[name="modo-acesso"]:checked') || {}).value;
+    if (modo === 'temporaria') {
+      api('POST', 'equipe/usuarios', { nome: nome, email: email, papel: $('cv-papel').value }).then(function (r) {
+        b.disabled = false; $('cv-nome').value = ''; $('cv-email').value = '';
+        mostrarCredencial('Acesso de ' + nome + ' criado. Passe estes dados para a pessoa: no primeiro acesso ela cria a senha dela. A temporária aparece só agora e vale 7 dias.', r.email, r.senha_temporaria);
+        carregarEquipe();
+      }, function (er) { b.disabled = false; aviso('msg-convite', er.message, 'erro'); });
+      return;
+    }
     api('POST', 'equipe/convites', { nome: nome, email: email, papel: $('cv-papel').value }).then(function (r) {
       b.disabled = false; $('cv-nome').value = ''; $('cv-email').value = '';
       $('link-convite-texto').textContent = r.link; $('link-convite').hidden = false;
       aviso('msg-convite', 'Convite criado para ' + email + '.', 'ok'); carregarEquipe();
     }, function (er) { b.disabled = false; aviso('msg-convite', er.message, 'erro'); });
   });
+  $('copiar-credencial').addEventListener('click', function () {
+    var t = 'Cérebro Win7 Med: https://start.win7.ai\nE-mail: ' + $('cred-email').textContent + '\nSenha temporária: ' + $('cred-senha').textContent + '\nNo primeiro acesso, o sistema pede para criar a sua senha.', b = this;
+    var ok = function () { b.textContent = 'Copiado'; setTimeout(function () { b.textContent = 'Copiar tudo'; }, 2500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { window.getSelection().selectAllChildren($('credencial')); });
+    else window.getSelection().selectAllChildren($('credencial'));
+  });
+  $('fechar-credencial').addEventListener('click', function () { $('credencial').hidden = true; $('cred-senha').textContent = ''; });
   $('copiar-convite').addEventListener('click', function () {
     var t = $('link-convite-texto').textContent, b = this;
     var ok = function () { b.textContent = 'Link copiado'; setTimeout(function () { b.textContent = 'Copiar link'; }, 2500); };

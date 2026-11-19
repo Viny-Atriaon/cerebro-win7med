@@ -72,3 +72,20 @@ Pedido do Viny: "Bota um botão de salvar, sei lá, arquivar, entendeu? Criar pa
    - **A chave:** fica em `chave-copia.txt` (0600, fora da pasta pública) e em `.segredos/start-copia.env` no computador que publica. Precisa estar também no gerenciador de senhas.
    - **No computador:** a tarefa Win7-BackupFora (`app/deploy/backup_fora.py` do GoogleX) baixa as cópias para `Documentos\Backups Win7\cerebro` (60 dias) e sobe para o Drive cifrado (90 dias). O Cérebro é opcional ali: a falha dele não derruba a cópia do GoogleX e do MetaX.
    - **Ensaio de restauração:** `node start/testes/restaurar-copia.mjs <arquivo> [--para <pasta-vazia>]`.
+
+## Adendo · 19/11/2026: acesso de administrador com senha temporária
+O Viny perguntou: "cadê esses acessos?". Ninguém tinha entrado: o único acesso era o link de convite, que ficou num arquivo local. Ele pediu "um acesso admin que eu possa adicionar outros usuários... uma senha temporária, onde quando eu entrar, depois eu habilite outras senhas".
+1. **Senha temporária:** 12 letras e números, sem os que confundem, vale 7 dias.
+   - Quem entra com ela só consegue criar a própria senha: a API responde `TROCAR_SENHA` (403) para todo o resto, e a tela mostra "Crie a sua senha".
+   - Depois da troca, a temporária para de valer e as outras sessões da pessoa caem.
+2. **Acesso de administrador:** `python -X utf8 scripts/acessos_start.py <email>`.
+   - O script calcula o hash com o PHP local e envia só o hash, como `usuarios-semente.json` (0600, fora da pasta pública). A API absorve na próxima requisição.
+   - O e-mail de login fica fora do código, porque o repositório é público.
+   - O HTML com o endereço, o login, a senha temporária e o passo a passo fica em `.segredos/ACESSOS-START.html` (fora do git). A senha nunca aparece no terminal nem no chat.
+   - Rodar de novo gera outra temporária. Serve para o administrador que perdeu a senha.
+3. **Equipe (administrador):**
+   - "Adicionar pessoa" com **Senha temporária**, o padrão: o sistema mostra a senha uma vez, com o botão "Copiar tudo". O **Link de convite** continua como opção.
+   - "Redefinir senha" em cada pessoa: sai uma temporária nova e as sessões dela caem.
+   - Selo "senha temporária" para quem ainda não criou a senha.
+   - "Cancelar" também no convite sem e-mail.
+4. **Para todos:** "Trocar minha senha" no menu da conta, que pede a senha atual.
