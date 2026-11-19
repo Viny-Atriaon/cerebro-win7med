@@ -4,6 +4,12 @@
 > **Repositório público** (ADR-009): este arquivo não leva nome de cliente, pasta de cliente, link com token, dado da equipe nem endereço do servidor. O estado de cada cliente real fica na pasta do cliente (fora do git, `LEIA-PRIMEIRO.md` ou `ESTADO.md` de lá) e nos projetos salvos do start.win7.ai. A história até 18/11/2026 (PR-001 a PR-022, com os clientes reais) está no repositório privado `Viny-Atriaon/cerebro-win7med-historico`.
 
 ## Último checkpoint
+- **Super admin (19/11, pedido do Viny):**
+  - O super admin é o e-mail do Viny (fica só no servidor, nunca no git), criado com `acessos_start.py <email> --super --nome ... --desativar <genérico>`.
+  - Nenhum outro administrador desativa nem redefine a senha dele, e ninguém cria conta ou convite por cima desse e-mail.
+  - O `admin@win7.ai` genérico foi desativado.
+  - O HTML novo está em `.segredos/ACESSOS-START.html` e foi enviado ao Viny na conversa. A temporária vale até 26/11/2026, com troca obrigatória.
+  - Commit `df8deca`, PR-026.
 - **Acessos com senha temporária (19/11, adendo da ADR-008, pedido do Viny):** até aqui ninguém tinha entrado, porque o único acesso era o link de convite num arquivo local.
   - **Acesso de administrador:** criado com `scripts/acessos_start.py`. Quem entra com a senha temporária é obrigado a criar a própria senha. A temporária vale até 26/11/2026.
   - **O HTML para o Viny:** `.segredos/ACESSOS-START.html` (fora do git), com endereço, login, senha temporária e passo a passo.
@@ -44,7 +50,7 @@
   - O pre-push recusa qualquer push que leve a história antiga para o público.
   - Primeiro commit do público: `64b7b67` (PR-023). A história anterior termina em `1b0c054`, no histórico.
 - **Estado do sistema (18/11):**
-  - `npm test`: Motor 1 ok, robô 3 com 60 checagens ok, API do start com 108 checagens ok (pastas, versões, cópia cifrada do dia, senha temporária).
+  - `npm test`: Motor 1 ok, robô 3 com 60 checagens ok, API do start com 113 checagens ok (pastas, versões, cópia cifrada do dia, senha temporária, super admin).
   - `npm run qa:start`: ok, de ponta a ponta no navegador. Convite, Gerar, onboarding e mapeamento salvos; o projeto reabre em outro navegador sem nada guardado, com as respostas; 1440 e 375 px sem rolagem lateral e sem erro de console.
   - `bash scripts/audit.sh .`: 24 ✅ · 0 ❌ · 4 ⚠️ (sem banco, carga e capacidade não medidas, auditoria de dependências só com `--deps`: ver CONFORMIDADE).
   - `npm run audit:runtime -- --abuse`: 8 ✅ · 0 ❌.

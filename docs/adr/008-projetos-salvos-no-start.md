@@ -89,3 +89,8 @@ O Viny perguntou: "cadê esses acessos?". Ninguém tinha entrado: o único acess
    - Selo "senha temporária" para quem ainda não criou a senha.
    - "Cancelar" também no convite sem e-mail.
 4. **Para todos:** "Trocar minha senha" no menu da conta, que pede a senha atual.
+5. **Super admin (19/11, pedido do Viny):** o dono do sistema é um administrador marcado com `dono`.
+   - Nenhum outro administrador desativa nem redefine a senha dele, e ninguém cria conta ou convite com o e-mail dele.
+   - Criado por `acessos_start.py <email> --super`. O e-mail fica só no servidor, porque o repositório é público.
+   - `--desativar <email>` tira o acesso de outra conta na mesma publicação. Foi assim que o administrador genérico do primeiro acesso saiu.
+

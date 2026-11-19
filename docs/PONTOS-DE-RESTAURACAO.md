@@ -224,3 +224,12 @@
   - `audit.sh`: 24 ✅ · 0 ❌ · 4 ⚠️.
   - No ar: a conta do administrador foi conferida pela API do cPanel, e o hash confere com o HTML sem entrar no sistema; `/api/projetos` sem sessão responde 401.
 
+## PR-026 · 19/11/2026 · Super admin (dono do sistema)
+- **Commit:** `df8deca` · **Tipo:** adicionado
+- **Funcionalidades tocadas:** `start/api/index.php` (`dono`, `eh_dono`, semente com `desativar`), `start/index.html` (selo "super admin"), `scripts/acessos_start.py` (`--super`, `--nome`, `--desativar`), testes
+- **Adicionado:** conta de super admin, que só ela altera; desativar uma conta pela publicação
+- **Modificado:** o acesso de administrador genérico foi desativado (a conta fica, sem acesso)
+- **Removido:** nada
+- **Motivo:** pedido do Viny em 19/11: "o email super admin é o" dele
+- **Estado verificado neste ponto:** `npm test` = Motor 1 ok + robô 3 60 ok + API 113 ok; `audit.sh` = 24 ✅ · 0 ❌ · 4 ⚠️; no ar: API igual à local (SHA-256), super admin ativo e marcado para trocar a senha, genérico desativado, hash confere com o HTML (sem entrar no sistema)
+
